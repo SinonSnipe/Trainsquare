@@ -1,1 +1,1 @@
-# Trainsquare
+Trainsquare is an educational and skills platform which allows it's users to host their own in-person and online workshops as well as book courses, lessons and activities. Trainsquare is an MVP and due to the properietary nature of the code I can only provide code snippets of my code. This repository contains SQL, .NET and React code the Attendance feature
