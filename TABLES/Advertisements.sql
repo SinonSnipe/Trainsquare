@@ -1,13 +1,3 @@
-USE [Trainsquare]
-GO
-
-/****** Object:  Table [dbo].[Advertisements]    Script Date: 8/15/2022 3:15:11 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
 CREATE TABLE [dbo].[Advertisements](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[WorkShopId] [int] NOT NULL,
