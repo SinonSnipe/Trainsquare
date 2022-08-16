@@ -1,0 +1,24 @@
+ALTER Proc [dbo].[Advertisements_Delete]
+
+		 @Id int
+		
+
+/* ============== Test Code ==============
+
+			DECLARE @Id int = 9
+				  
+          
+		    EXECUTE dbo.Advertisements_Delete @Id 
+
+  ======================================= */
+
+
+AS 
+
+BEGIN
+
+DELETE FROM [dbo].[Advertisements]
+      WHERE @Id = Id
+
+
+END
