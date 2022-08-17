@@ -1,0 +1,51 @@
+ALTER   proc [dbo].[WorkshopRequest_InsertV3]
+			 @Id int OUTPUT
+			,@UserId int 
+			,@HostId int 
+			,@Topic nvarchar(150)
+			,@BriefDescription nvarchar(1000)
+			,@DateCreated datetime2(7)
+			,@DateModified datetime2(7)
+
+as
+/*
+Declare  @Id int = 0
+		,@UserId int = 15
+		,@HostId int = 266
+		,@Topic nvarchar(150) = 'Gaming'
+		,@BriefDescription nvarchar(1000) = 'This course will teach you everything about gaming. From Minecraft to Fortnite to harder games like Elden Ring, we will make sure you are up to date with the latest games. There will also be a crash course on the history of game consoles such as Sega, Nintendo, and Playstation.'
+		,@DateCreated datetime2(7) = getutcdate()
+		,@DateModified datetime2(7) = getutcdate()
+
+Execute dbo.WorkshopRequest_InsertV3
+		 @Id
+		,@UserId  
+		,@HostId  
+		,@Topic 
+		,@BriefDescription ,@DateCreated 
+		,@DateModified
+		
+
+Select *
+From dbo.WorkshopRequests
+*/
+Begin
+
+INSERT INTO [dbo].[WorkshopRequests]
+           ([UserId]
+           ,[HostId]
+           ,[Topic]
+           ,[BriefDescription]
+           ,[DateCreated]
+           ,[DateModified])
+     VALUES
+			
+			(@UserId  
+			,@HostId  
+			,@Topic 
+			,@BriefDescription 
+			,@DateCreated 
+			,@DateModified) 
+			
+	SET      @Id = SCOPE_IDENTITY()
+End
