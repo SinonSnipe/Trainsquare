@@ -1,0 +1,22 @@
+ALTER PROC [dbo].[Inventory_Delete_ById]
+				@Id int
+
+/*
+
+	Declare @Id int = 50
+
+	Execute [dbo].[Inventory_Delete_ById] @Id
+
+	
+
+	
+*/
+as
+
+BEGIN
+
+	DELETE
+	FROM  [dbo].[Inventory]
+	WHERE Id = @Id
+
+END
