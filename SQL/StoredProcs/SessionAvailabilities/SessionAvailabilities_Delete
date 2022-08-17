@@ -1,0 +1,17 @@
+ALTER proc [dbo].[SessionAvailabilities_Delete]
+				@Id int
+
+as 
+/*
+		Declare @Id int = 8
+
+		Execute [dbo].[SessionAvailabilities_Select_ById] @Id
+		Execute [dbo].[SessionAvailabilities_Delete] @Id
+		Execute [dbo].[SessionAvailabilities_Select_ById] @Id
+*/
+
+BEGIN
+		Delete
+		From dbo.SessionAvailabilities
+		Where Id = @Id
+END
