@@ -1,0 +1,12 @@
+ALTER proc [dbo].[TagsTypes_SelectAll]
+/*
+EXECUTE [dbo].[TagsTypes_SelectAll]
+*/
+AS
+BEGIN
+
+	SELECT  Id	
+			, Name 
+			FROM dbo.TagsTypes
+        
+END
