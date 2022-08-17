@@ -1,0 +1,25 @@
+ALTER PROC [dbo].[UserTokens_Insert]
+					@Token varchar(200)
+					,@UserId int
+					,@TokenType int
+AS
+/*
+
+
+
+*/
+BEGIN 
+
+
+INSERT INTO [dbo].[UserTokens]
+           ([Token]
+           ,[UserId]
+           ,[TokenType])
+     VALUES
+           (@Token
+			,@UserId
+			,@TokenType)
+
+
+
+END
