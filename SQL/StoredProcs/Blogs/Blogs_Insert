@@ -1,0 +1,79 @@
+ALTER proc [dbo].[Blogs_Insert]
+					@Id int OUTPUT
+				   ,@BlogTypeId int
+				   ,@AuthorId int
+				   ,@Title nvarchar(50)
+				   ,@Subject nvarchar(50)
+				   ,@Content nvarchar (MAX)
+				   ,@IsPublished bit
+				   ,@ImageUrl nvarchar(255)
+				   ,@StatusId int
+
+						
+
+/*-----TEST CODE-------
+
+
+	DECLARE			@Id int = 0
+				   ,@BlogTypeId int = 2
+				   ,@AuthorId int = 213
+				   ,@Title nvarchar(50) = 'Photography Concepts'
+				   ,@Subject nvarchar(50) = 'Hobby'
+				   ,@Content nvarchar (MAX) = 'A webinar for photographers. Please register to receive the webinar link.'
+				   ,@IsPublished bit = 0
+				   ,@ImageUrl nvarchar(255) = 'https://tinyurl.com/2p8wjhr7'
+				   ,@StatusId int = 1
+
+
+		Execute		[dbo].[Blogs_Insert]	@Id OUTPUT
+										   ,@BlogTypeId
+										   ,@AuthorId
+										   ,@Title
+										   ,@Subject
+										   ,@Content
+										   ,@IsPublished
+										   ,@ImageUrl
+										   ,@StatusId
+										  
+	Select *
+	FROM dbo.Blogs
+
+
+	select * from dbo.UserProfiles
+
+
+*/
+
+
+
+AS
+
+
+
+BEGIN
+
+	--Blogs--
+	INSERT INTO		[dbo].[Blogs]
+				   ([BlogTypeId]
+				   ,[AuthorId]
+				   ,[Title]
+				   ,[Subject]
+				   ,[Content]
+				   ,[IsPublished]
+				   ,[ImageUrl]
+				   ,[StatusId])
+
+		VALUES					
+				   (@BlogTypeId 
+				   ,@AuthorId
+				   ,@Title
+				   ,@Subject
+				   ,@Content
+				   ,@IsPublished
+				   ,@ImageUrl
+				   ,@StatusId)
+
+		SET			@Id = SCOPE_IDENTITY()
+
+
+END
