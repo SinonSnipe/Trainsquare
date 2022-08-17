@@ -1,0 +1,17 @@
+ALTER proc [dbo].[UrlTypes_SelectAll]
+				
+
+/*
+
+	Execute [dbo].[UrlTypes_SelectAll] 
+
+*/
+
+as
+BEGIN
+
+	SELECT  [Id]
+			,[Name]
+	FROM	[dbo].[UrlTypes]
+		
+END
