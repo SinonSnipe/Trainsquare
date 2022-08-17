@@ -1,0 +1,32 @@
+ALTER PROC [dbo].[WorkShopRequestForm_Delete]
+
+@InstructorId int
+
+as 
+
+
+/*
+DECLARE @InstructorId  int = 8
+
+Select * 
+From dbo.WorkShopRequestForm
+WHERE InstructorId = @InstructorId
+
+Execute dbo.WorkShopRequestForm_Delete
+                          @InstructorId
+
+Select * 
+From dbo.WorkShopRequestForm
+WHERE InstructorId = @InstructorId
+
+*/
+
+
+BEGIN
+
+
+DELETE FROM [dbo].[WorkShopRequestForm]
+      WHERE InstructorId  = @InstructorId 
+
+
+END
