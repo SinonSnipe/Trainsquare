@@ -1,0 +1,33 @@
+ALTER PROC [dbo].[Notes_Delete_ById]
+			@Id int
+AS
+
+/*---TEST CODE---
+
+DECLARE		@Id int = 7
+
+SELECT Id, Notes
+FROM dbo.Notes
+WHERE Id = @Id;
+
+
+EXECUTE [dbo].[Notes_Delete_ById] @Id
+
+SELECT Id, Notes
+FROM dbo.Notes
+WHERE Id = @Id;
+
+select *
+from notes
+
+*/
+BEGIN
+
+	DELETE FROM [dbo].[Notes]
+	WHERE	Id = @Id
+
+END
+
+
+
+
