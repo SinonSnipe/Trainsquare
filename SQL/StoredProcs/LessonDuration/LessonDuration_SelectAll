@@ -1,0 +1,17 @@
+ALTER proc [dbo].[LessonDuration_SelectAll]
+
+as
+
+/*
+
+ Execute dbo.LessonDuration_SelectAll
+
+*/
+
+BEGIN
+
+Select Id, Name
+from dbo.LessonDuration
+
+
+END
