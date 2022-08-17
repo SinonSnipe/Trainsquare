@@ -1,0 +1,225 @@
+import React, { useEffect, useState } from 'react';
+import debug from 'sabio-debug';
+import * as advertisementService from '../../services/advertisementService';
+import toastr from '../../utils/toastr';
+import { Formik, Form, Field } from 'formik';
+import * as WorkShopService from '../../services/workShopService';
+import { useLocation } from 'react-router-dom';
+import DatePickerFormik from '../sessions/DatePickerFormik';
+import Dropzone from '../files/Dropzone';
+
+const _logger = debug.extend('AdvertisementForm');
+
+function NewAdvertisement() {
+    const [adFormData, setFormAd] = useState({
+        workShopId: 0,
+        title: '',
+        adMainImage: '',
+        details: '',
+        dateStart: new Date(),
+        dateEnd: new Date(),
+    });
+
+    const [advertisementId, setAdvertisementId] = useState({ id: 0 });
+
+    const location = useLocation();
+
+    const [workShopFormData, setWorkShopData] = useState({
+        workShop: [],
+        workShopComponent: [],
+    });
+
+    useEffect(() => {
+        WorkShopService.paginate(0, 6).then(onGetWorkShopSuccess).catch(onGetWorkShopError);
+    }, []);
+
+    useEffect(() => {
+        if (location.state && location.state.id !== advertisementId.id) {
+            setFormAd((prevState) => {
+                let adToBeUpdated = { ...prevState };
+                adToBeUpdated = location.state;
+
+                adToBeUpdated.dateStart = new Date(location.state.dateStart);
+                adToBeUpdated.dateEnd = new Date(location.state.dateEnd);
+                return adToBeUpdated;
+            });
+            setAdvertisementId((prevState) => {
+                let pd = { ...prevState };
+                pd.id = location.state.id;
+                return pd;
+            });
+        }
+    }, []);
+
+    const timePickerEndDate = new Date();
+    timePickerEndDate.setFullYear(timePickerEndDate.getFullYear() + 2);
+
+    const mapWorkShop = (aWorkShop) => {
+        return (
+            <option key={'List' + aWorkShop.id} value={aWorkShop.id}>
+                {aWorkShop.name}
+            </option>
+        );
+    };
+
+    const onGetWorkShopSuccess = (data) => {
+        _logger(data);
+
+        let pageIndex = data.item.pageIndex;
+        let pageSize = data.item.pageSize;
+        let totalPages = data.item.totalPages;
+        let arrOfworkShop = data.item.pagedItems;
+        _logger(arrOfworkShop);
+
+        setWorkShopData((prevState) => {
+            const pState = { ...prevState };
+            pState.workShop = arrOfworkShop;
+            pState.currentPage = pageIndex + 1;
+            pState.pageSize = pageSize;
+            pState.totalPages = totalPages;
+            pState.workShopComponent = arrOfworkShop.map(mapWorkShop);
+            return pState;
+        });
+    };
+
+    const onClickCreateAdvertisement = (values) => {
+        _logger(values);
+
+        if (advertisementId.id > 0) {
+            advertisementService
+                .update(values, advertisementId?.id)
+                .then(updateAdvertisementSuccess)
+                .catch(updateAdvertisementError);
+        } else {
+            advertisementService.post(values).then(postAdSuccess).catch(postAdError);
+        }
+    };
+
+    const resetForm = () => {
+        setFormAd((prevState) => {
+            let pd = { ...prevState };
+            pd.title = ' ';
+            return pd;
+        });
+
+        setAdvertisementId((prevState) => {
+            let ad = { ...prevState };
+            ad.id = 0;
+            return ad;
+        });
+    };
+
+    const onGetWorkShopError = (error) => {
+        _logger(error);
+    };
+
+    const updateAdvertisementSuccess = (response) => {
+        _logger(response);
+        toastr.success('Your advertisement was successfully update!');
+    };
+
+    const updateAdvertisementError = (error) => {
+        _logger(error);
+        toastr.error('Your advertisement failed to update, try again!');
+    };
+
+    const postAdSuccess = (data) => {
+        _logger(data);
+        let newId = data.item;
+        toastr.success('Your advertisement was successfully created!');
+        setAdvertisementId((prevState) => {
+            let adData = { ...prevState };
+            adData.id = newId;
+            return adData;
+        });
+    };
+
+    const postAdError = (error) => {
+        _logger(error);
+        toastr.error('Your advertisement was unsuccessful, try again!');
+    };
+
+    const fileReturned = (upload) => {
+        _logger(`${upload[0].url} was uploaded.`);
+        setFormAd((prevState) => {
+            let ps = { ...prevState };
+            ps.adMainImage = upload[0].url;
+
+            return ps;
+        });
+    };
+
+    return (
+        <React.Fragment>
+            <Formik enableReinitialize={true} initialValues={adFormData} onSubmit={onClickCreateAdvertisement}>
+                {({ setFieldValue, values }) => (
+                    <Form className="p-3 shadow m-3 col-lg-6">
+                        <h4> {advertisementId.id >= 1 ? 'Lets Update Your Workshop' : 'Lets Create a Workshop'}</h4>
+                        <div className="form-group p-1">
+                            <label htmlFor="workShopId">Workshop</label>
+                            <div>
+                                {' '}
+                                <Field className="btn btn-small drop" as="select" type="text" name="workShopId">
+                                    <option defaultValue={0}>Choose an Option</option>
+                                    {workShopFormData.workShopComponent}
+                                </Field>
+                            </div>
+                        </div>
+                        <div className="form-group p-1">
+                            <label htmlFor="Title">Title of Workshop</label>
+                            <div>
+                                {' '}
+                                <Field className="form-control" type="text" name="title" />
+                            </div>
+                        </div>
+                        <div className="form-group p-1">
+                            <label htmlFor="adMainImage">Image for advertisement</label>
+                            <div>
+                                {' '}
+                                <Dropzone uploadedFiles={fileReturned} name="adMainImage" />
+                            </div>
+                        </div>
+                        <div className="form-group p-1">
+                            <label htmlFor="Details">Details about the advertisement</label>
+                            <div>
+                                {' '}
+                                <Field className="form-control" type="text" name="details" />
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="form-group m-2 col-lg-4 p-1">
+                                <label htmlFor="dateStart">Start date </label>
+
+                                <DatePickerFormik
+                                    start={new Date().toLocaleDateString()}
+                                    end={timePickerEndDate.toLocaleDateString()}
+                                    name="dateStart"
+                                    value={values.dateStart}
+                                    onChange={setFieldValue}
+                                />
+                            </div>
+                            <div className="form-group m-2 col-lg-4 p-1">
+                                <label htmlFor="dateEnd">End date</label>
+                                <DatePickerFormik
+                                    start={new Date().toLocaleDateString()}
+                                    end={timePickerEndDate.toLocaleDateString()}
+                                    name="dateEnd"
+                                    value={values.dateEnd}
+                                    onChange={setFieldValue}
+                                />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary m-1">
+                            {advertisementId.id >= 1 ? 'Update Advertisement' : 'Create Advertisement'}
+                        </button>
+                        <button onClick={resetForm} type="button" className="btn m-1 btn-secondary ">
+                            Reset Form
+                        </button>
+                    </Form>
+                )}
+            </Formik>
+        </React.Fragment>
+    );
+}
+
+export default NewAdvertisement;
