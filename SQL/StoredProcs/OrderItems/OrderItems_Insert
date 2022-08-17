@@ -1,0 +1,49 @@
+ALTER PROCEDURE [dbo].[OrderItems_Insert] 
+					@OrderId INT
+					,@InventoryId INT
+					,@Quantity INT
+					,@UserId INT
+					,@Id INT OUTPUT
+
+AS
+
+/* ----- Test Code -----
+
+	DECLARE         @OrderId INT = 17
+					,@InventoryId INT = 11
+					,@Quantity INT = 1
+					,@UserId INT = 261
+					,@Id INT = 0
+
+	SELECT * FROM dbo.OrderItems
+
+	EXECUTE dbo.OrderItems_Insert
+					@OrderId
+					,@InventoryId
+					,@Quantity
+					,@UserId
+					,@Id OUTPUT
+	
+	SELECT * FROM dbo.OrderItems
+
+----- End Test Code -----
+*/
+
+BEGIN
+
+	INSERT INTO [dbo].[OrderItems]
+			   ([OrderId]
+			   ,[InventoryId]
+			   ,[Quantity]
+			   ,[CreatedBy]
+			   ,[ModifiedBy])
+		 VALUES
+			   (@OrderId
+			   ,@InventoryId
+			   ,@Quantity
+			   ,@UserId
+			   ,@UserId)
+
+	SET @Id = SCOPE_IDENTITY()
+
+END
