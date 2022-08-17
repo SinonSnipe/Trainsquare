@@ -1,0 +1,37 @@
+ALTER proc [dbo].[NewsletterTemplates_Delete_ById]
+			@Id int
+
+as
+
+/* 
+
+Declare @Id int = 4
+SELECT		Id
+			,Name
+			,Description
+			,PrimaryImage
+			,CreatedBy
+
+From dbo.NewsletterTemplates
+WHERE Id = @Id;
+
+EXECUTE [dbo].[NewsletterTemplates_Delete_ById] @Id
+
+SELECT		Id
+			,Name
+			,Description
+			,PrimaryImage
+			,CreatedBy
+
+From dbo.NewsletterTemplates
+WHERE Id = @Id;
+
+
+*/
+BEGIN 
+	
+			DELETE FROM [dbo].[NewsletterTemplates]
+			WHERE Id = @Id
+END
+
+
