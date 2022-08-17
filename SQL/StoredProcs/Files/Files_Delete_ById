@@ -1,0 +1,31 @@
+ALTER proc [dbo].[Files_Delete_ById]
+						@Id int 
+
+AS
+
+/* TEST CODE
+	
+			Declare @Id int = 3
+
+			Select *
+			From dbo.Files
+			Where Id = @Id
+		
+			Execute dbo.Files_Delete_ById
+						@Id 
+
+			Select *
+			From dbo.Files
+			Where Id = @Id
+
+*/
+
+BEGIN
+
+			DELETE FROM dbo.Files
+
+			WHERE Id = @id
+
+END
+
+
