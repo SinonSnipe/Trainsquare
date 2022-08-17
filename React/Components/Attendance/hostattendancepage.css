@@ -1,0 +1,147 @@
+#attendees  {
+   font-size:12px;
+   color:black;
+   margin-left:80px;
+   font-family:sans-serif;
+  }
+
+.row{
+    display:flex;
+    margin:10px;
+}
+
+#infoContent{
+    width:12%;
+    margin-left:5%;
+    margin-top:12px;
+}
+
+.contentBox >.column{
+justify-content: center;
+align-items: center;
+}
+
+.column#usersDisplay{
+    float:right;
+    width:82%;
+    color:black;
+}
+
+#attendees > span {
+    margin:15px;
+}
+
+#attendees > .card{
+    width:95%;
+}
+
+span .account-user-avatar{
+    justify-content: center;
+}
+
+#tableOfUsers.card-body{
+    Width:100%;
+}
+
+#tableOfUsers > .table{
+    color:black;
+}
+#tableOfUsers > h4{
+   font-size: 22px;
+   padding:45px;
+   color:rgb(10, 10, 10);
+}
+
+.Counter >.countBox{
+    color:white;
+    font-size:30px;
+   background-color: rgb(136, 90, 254);
+   width:200px;
+   height:200px;
+   border-radius: 30%;
+}
+
+#infoContent > .Counter{
+    color:rgb(89, 88, 88);
+}
+
+#infoContent >.dropdown{
+    margin-left:12%;
+}
+
+#infoContent > .column{
+   align-items: center;
+   justify-content:center; 
+}
+
+.btn.dropdown-toggle{
+ background-color:#3729f792;
+ border-color:#b2abd76e;
+ box-shadow: 0 2px 6px 0 rgba(184, 157, 247, 0.5)  ;
+}
+
+#intro-Attendance-Form {
+    margin-left:5%;
+    margin-right:6%;
+    padding:35px;
+}
+
+#intro-Attendance-Form h2{
+padding: 15px;
+}
+
+.contentBox{
+padding:35px;
+}
+
+div.text-center{
+    display:flex;
+    margin:10px;
+    text-align:center;
+}
+
+.toast-success{
+    background-color:#5146f4c2;
+}
+input[type=checkbox]{
+    width:20px;
+    height:20px;
+    margin-left:20px;
+}
+input[type="checkbox"]:checked{
+    accent-color: #3a2df992;
+}
+
+.placeHolder-text{
+    size: 15px;
+    color:rgb(161, 161, 161);
+    align-self: center;
+}
+
+.card.countingC {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    width:200px;
+    height:auto;
+    border-radius: 5%;
+    text-align: center;
+    background-color: #2c03fa7d;
+    color: white;
+    margin-top:15%;
+  }
+  
+  .user-i {
+    font-size:50px;
+    height:auto;
+    width:50%;
+
+}
+
+.countingC >p{
+padding:5px;
+margin:8px;
+}
+
+.countingC >h3{
+    font-size: 45px;
+ }  
