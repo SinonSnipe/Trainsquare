@@ -1,0 +1,20 @@
+ALTER PROCEDURE [dbo].[ExternalLinks_Delete_ById]
+				@Id int
+
+/* ------- Test Code Begin -------
+
+	EXECUTE		dbo.ExternalLinks_Delete_ById
+				@Id = 25
+	SELECT		*
+	FROM		dbo.ExternalLinks
+	
+*/ -------- Test Code End --------
+
+AS
+
+BEGIN
+
+	DELETE FROM dbo.ExternalLinks
+	WHERE		Id = @Id
+
+END
