@@ -1,0 +1,50 @@
+ALTER proc [dbo].[NewsletterTemplateKeys_Insert]
+				@Id int OUTPUT
+				,@KeyTypeId int
+				,@TemplateId int
+				,@KeyName nvarchar(50)
+
+
+AS
+/* 
+
+DECLARE							@Id int = 0 
+								,@KeyTypeId int = 1
+								,@TemplateId int = 3
+								,@KeyName nvarchar(50) = 'Header_Title'
+
+EXECUTE [dbo].[NewsletterTemplateKeys_Insert] 
+								@Id OUTPUT	
+								,@KeyTypeId 
+								,@TemplateId 
+								,@KeyName 
+
+
+SELECT							Id 	
+								,KeyTypeId 
+								,TemplateId 
+								,KeyName 
+								from dbo.NewsletterTemplateKeys
+
+*/
+
+BEGIN
+
+INSERT INTO [dbo].[NewsletterTemplateKeys]
+           ([KeyTypeId]
+           ,[TemplateId]
+           ,[KeyName])
+           
+VALUES
+			(@KeyTypeId
+           ,@TemplateId
+           ,@KeyName)
+
+          
+	
+SET		@Id = SCOPE_IDENTITY()
+
+	
+END
+
+
