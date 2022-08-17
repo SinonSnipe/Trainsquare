@@ -1,0 +1,52 @@
+ALTER PROC [dbo].[WorkshopRegistration_Insert]
+
+			@WorkshopId int
+			, @UserId int	
+			, @StatusId int
+
+AS
+
+/* --------- Test Code ------------
+
+	DECLARE @WorkshopId int = 7
+			, @UserId int = 261
+			, @StatusId int = 4
+
+	EXECUTE [dbo].[WorkshopRegistration_Insert]
+			@WorkshopId
+			, @UserId
+			, @StatusId
+
+	SELECT	*
+	FROM	[dbo].[WorkshopRegistration]
+
+*/
+
+BEGIN 
+
+	IF EXISTS (	
+			SELECT  @WorkshopId, @UserId 
+			FROM	[dbo].[WorkshopRegistration]
+			WHERE	WorkshopId = @WorkshopId AND
+					UserId = @UserId
+	) 
+		BEGIN
+			UPDATE	[dbo].[WorkshopRegistration]
+			SET		[StatusId] = @StatusId
+
+			WHERE	WorkshopId = @WorkshopId AND
+					UserId = @UserId
+		END
+	ELSE
+		BEGIN
+			INSERT INTO [dbo].[WorkshopRegistration]
+					([WorkshopId]
+					, [UserId]
+					, [StatusId])
+			VALUES
+					(@WorkshopId
+					, @UserId
+					, @StatusId)
+		END;
+	
+END 
