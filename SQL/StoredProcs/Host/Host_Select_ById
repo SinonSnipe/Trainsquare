@@ -1,0 +1,24 @@
+ALTER   Proc [dbo].[Host_Select_ById]
+			@HostId int
+
+AS
+/*
+Declare @HostId int = 266;
+
+Execute Host_Select_ById
+		@HostId
+*/
+SELECT  
+DISTINCT    ws.HostId,
+			up.Id,
+			up.FirstName,
+			up.Mi,
+			up.LastName,
+			up.AvatarUrl,
+			up.DateCreated,
+			u.Email
+  FROM [dbo].[WorkShop] as ws inner join dbo.UserProfiles as up 
+	on ws.HostId = up.UserId
+	inner join dbo.Users as u
+	on ws.HostId = u.Id
+  Where @HostId = u.Id
