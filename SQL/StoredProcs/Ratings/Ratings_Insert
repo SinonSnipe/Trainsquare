@@ -1,0 +1,61 @@
+ALTER PROC [dbo].[Ratings_Insert]
+			@Id int OUTPUT
+           ,@Rating tinyint 
+           ,@CommentId int
+           ,@EntityTypeId int
+           ,@EntityId int
+           ,@CreatedBy int
+           ,@IsDeleted bit
+
+/* ---TEST CODE---
+
+DECLARE @Id int = 1
+		,@Rating tinyint = 4
+		,@CommentId int = 1234
+		,@EntityTypeId int = 5678
+		,@EntityId int = 3456
+		,@CreatedBy int = 1
+		,@IsDeleted bit = 0
+
+EXECUTE [dbo].[Ratings_Insert]
+		@Id OUTPUT
+		,@Rating
+		,@CommentId
+		,@EntityTypeId
+		,@EntityId
+		,@CreatedBy
+		,@IsDeleted
+
+SELECT * FROM [dbo].[Ratings]
+
+
+*/
+
+
+AS
+
+BEGIN
+
+
+	INSERT INTO [dbo].[Ratings]
+           ([Rating]
+           ,[CommentId]
+           ,[EntityTypeId]
+           ,[EntityId]
+           ,[CreatedBy]
+           ,[IsDeleted])
+
+     VALUES
+           (@Rating
+           ,@CommentId
+           ,@EntityTypeId
+           ,@EntityId
+           ,@CreatedBy
+           ,@IsDeleted)
+
+	SET @Id = SCOPE_IDENTITY()
+
+
+
+
+END
