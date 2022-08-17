@@ -1,0 +1,27 @@
+ALTER PROC [dbo].[NewsletterSubscriptions_Insert]
+			@Email nvarchar(255)
+			
+
+AS
+
+/*
+
+
+DECLARE @Email nvarchar(255) = 'boogie@email.com'
+
+EXECUTE dbo.NewsletterSubscriptions_Insert @Email
+											
+SELECT *
+FROM dbo.NewsletterSubscriptions
+
+*/
+
+BEGIN
+
+INSERT INTO [dbo].[NewsletterSubscriptions]
+			([Email])
+
+			VALUES
+			(@Email)
+
+END
