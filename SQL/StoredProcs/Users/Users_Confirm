@@ -1,0 +1,45 @@
+ALTER PROC [dbo].[Users_Confirm]
+			   @Confirm bit
+			   ,@Id int 
+AS
+/*
+
+	DECLARE @Id int = 3
+	
+	DECLARE @Confirm bit = 1
+
+	EXECUTE [dbo].[Users_Confirm]
+			@Confirm
+			,@Id
+
+	SELECT u.Id
+		  ,[Email]
+		  ,[Password]
+		  ,[IsConfirmed]
+		  ,s.Name AS UserStatus
+		  ,[DateCreated]
+		  ,[DateModified]
+	  FROM [dbo].[Users] AS u INNER JOIN dbo.UserStatus AS s
+			ON u.UserStatusId = s.Id
+	WHERE @Id = u.Id 
+
+
+
+			
+ 
+
+*/
+BEGIN 
+
+
+	DECLARE @DateMod  datetime2(7) = GETUTCDATE()
+
+	UPDATE [dbo].[Users]
+	   SET [IsConfirmed] = @Confirm
+		  ,[DateModified] = @DateMod
+	 WHERE @Id = Id
+
+
+
+
+END
