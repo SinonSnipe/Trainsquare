@@ -1,0 +1,28 @@
+ALTER proc [dbo].[SurveyQuestionTypes_Delete_ById]
+											@Id int 
+
+AS
+
+/* TEST CODE
+	
+			Declare @Id int = 8
+
+			Execute dbo.SurveyQuestionTypes_Select_ById
+											@Id 
+		
+			Execute dbo.SurveyQuestionTypes_Delete_ById
+											@Id 
+
+			Execute dbo.SurveyQuestionTypes_Select_ById 
+											@Id 
+
+*/
+
+
+BEGIN
+
+			DELETE FROM [dbo].SurveyQuestionTypes
+
+			WHERE Id = @id
+
+END
