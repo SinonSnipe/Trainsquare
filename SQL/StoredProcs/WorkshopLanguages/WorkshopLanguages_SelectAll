@@ -1,0 +1,22 @@
+ALTER proc [dbo].[WorkshopLanguages_SelectAll]
+		
+
+/*
+	
+
+	Execute [dbo].[WorkshopLanguages_SelectAll] 
+
+*/
+
+as
+BEGIN
+
+	
+
+	SELECT [Id]
+			,[Name]
+
+	FROM dbo.WorkshopLanguages
+	
+
+END
