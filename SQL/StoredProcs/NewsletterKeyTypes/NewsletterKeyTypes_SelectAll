@@ -1,0 +1,25 @@
+ALTER proc [dbo].[NewsletterKeyTypes_SelectAll]
+
+
+AS 
+
+
+
+/*
+
+
+ Execute dbo.NewsletterKeyTypes_SelectAll
+
+
+*/
+
+BEGIN
+
+SELECT [Id]
+      ,[Name]
+
+
+from dbo.NewsletterKeyTypes
+
+
+END
