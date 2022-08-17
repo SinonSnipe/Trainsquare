@@ -1,0 +1,19 @@
+ALTER proc [dbo].[Venues_DeletebyId] 
+			@Id int 
+as 
+/*---- Test Code ----
+Declare @id int = 5
+EXEC dbo.Venues_DeleteById @Id
+
+Select *
+From dbo.Venues
+
+SELECT * FROM  dbo.WorkShop
+
+Where Id = @Id
+*/
+BEGIN 
+		
+		DELETE FROM dbo.Venues 
+		WHERE Id = @Id 
+END
