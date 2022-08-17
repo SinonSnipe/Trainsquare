@@ -1,0 +1,32 @@
+ALTER proc [dbo].[FaqCategories_Insert]
+				@Name nvarchar(50)
+				,@Id int OUTPUT
+
+/*---------TEST--------
+
+	Declare @Name nvarchar(50) = 'Complaints'
+		   ,@ID int
+
+	Execute [dbo].[FaqCategories_Insert] 
+		   @Name
+		   ,@ID OUTPUT
+
+	SELECT *
+	FROM dbo.FaqCategories
+
+
+*/---------------
+
+as
+
+BEGIN
+
+INSERT INTO [dbo].[FaqCategories]
+           ([Name])
+     VALUES
+           (@Name)
+
+	 SET @ID = SCOPE_IDENTITY()
+END
+
+
