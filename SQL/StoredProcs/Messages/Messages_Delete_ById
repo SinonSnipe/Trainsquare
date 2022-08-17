@@ -1,0 +1,31 @@
+ALTER PROC [dbo].[Messages_Delete_ById]
+				@Id int
+AS
+/*
+
+	DECLARE @Id int = 11
+
+	SELECT *
+	  FROM [dbo].[Messages]
+	  WHERE @Id = Id
+
+	EXECUTE [dbo].[Messages_Delete_ById]
+			@Id
+
+	SELECT *
+	  FROM [dbo].[Messages]
+	  WHERE @Id = Id
+
+*/
+BEGIN 
+
+
+
+DELETE FROM [dbo].[Messages]
+      WHERE @Id = Id
+
+
+
+
+
+END
