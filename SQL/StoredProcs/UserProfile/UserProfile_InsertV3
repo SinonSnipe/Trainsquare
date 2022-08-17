@@ -1,0 +1,51 @@
+ALTER   Proc [dbo].[UserProfile_InsertV3]
+		   @UserId int,
+           @FirstName nvarchar(100),
+           @LastName nvarchar(100),
+           @Mi nvarchar(2),
+           @AvatarUrl varchar(255),
+           @DateCreated datetime2(7),
+           @DateModified datetime2(7)
+
+As
+/*
+
+
+Declare    @UserId int = 220,
+           @FirstName nvarchar(100) = 'Andrew',
+           @LastName nvarchar(100) = 'Settle',
+           @Mi nvarchar(2) = 'J',
+           @AvatarUrl varchar(255) = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vector%2Fman-character-face-avatar-in-glasses-vector-17074986&psig=AOvVaw2X3Kv5fbTjbCalm6EB2cGN&ust=1652235497104000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCJDX74fv0_cCFQAAAAAdAAAAABAD',
+           @DateCreated datetime2(7) = getutcdate(),
+           @DateModified datetime2(7) = getutcdate()
+
+Execute	dbo.UserProfile_InsertV3
+		   @UserId,
+           @FirstName,
+           @LastName,
+           @Mi,
+           @AvatarUrl,
+           @DateCreated,
+           @DateModified
+
+
+*/
+Begin
+
+INSERT INTO [dbo].[UserProfiles]
+           ([UserId]
+           ,[FirstName]
+           ,[LastName]
+           ,[Mi]
+           ,[AvatarUrl]
+           ,[DateCreated]
+           ,[DateModified])
+     VALUES
+          (@UserId,
+           @FirstName,
+           @LastName,
+           @Mi,
+           @AvatarUrl,
+           @DateCreated,
+           @DateModified)
+End
