@@ -1,0 +1,27 @@
+
+		ALTER   PROC [dbo].[Locations_Delete_ById]
+				@Id int
+
+AS
+
+/* ====== Test Code ======
+
+
+	DECLARE @Id int = 176;
+
+	EXECUTE dbo.Locations_Select_ById
+			@Id
+
+	EXECUTE dbo.Locations_Delete_ById
+			@Id
+
+	EXECUTE dbo.Locations_Select_ById
+			@Id
+
+*/
+BEGIN 
+
+	DELETE FROM [dbo].[Locations]
+		  WHERE Id = @Id;
+
+END
