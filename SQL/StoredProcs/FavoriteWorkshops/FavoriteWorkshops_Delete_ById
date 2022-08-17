@@ -1,0 +1,30 @@
+ALTER proc [dbo].[FavoriteWorkshops_Delete_ById]
+				@WorkShopId int,
+				@UserId int
+
+
+/*-----------     TEST CODE      ---------------
+
+	SELECT *
+	FROM dbo.FavoriteWorkshops
+
+	Declare @Id int = 204
+		   
+	Execute [dbo].[FavoriteWorkshops_Delete_ById] 
+		   @Id
+		  
+	SELECT *
+	FROM dbo.FavoriteWorkshops
+
+
+*/
+
+as
+
+BEGIN
+
+DELETE FROM [dbo].[FavoriteWorkshops]
+      WHERE WorkShopId = @WorkShopId 
+		AND UserId = @UserId
+
+END
