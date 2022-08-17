@@ -1,0 +1,23 @@
+ALTER proc [dbo].[UserRoles_insert]
+					@UserId int
+					,@RoleId int
+/*
+
+
+
+
+*/
+as
+
+BEGIN 
+
+
+	INSERT INTO [dbo].[UserRoles]
+			   ([UserId]
+			   ,[RoleId])
+		 VALUES
+			   (@UserId
+			   ,@RoleId)
+
+
+END
