@@ -1,0 +1,22 @@
+ALTER proc [dbo].[SurveyTypes_SelectAll]
+
+/*---------------------TEST--------------------------
+
+
+Execute dbo.SurveyTypes_SelectAll
+
+*/
+
+
+as
+
+
+BEGIN
+
+
+				SELECT [Id]
+						,[Name]
+
+				FROM dbo.SurveyTypes
+
+END
