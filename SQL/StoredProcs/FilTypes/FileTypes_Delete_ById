@@ -1,0 +1,28 @@
+ALTER proc [dbo].[FileTypes_Delete_ById]
+						@Id int 
+
+AS
+
+/* TEST CODE
+	
+			Declare @Id int = 2
+
+			Execute dbo.FileTypes_Select_ById @Id 
+		
+			Execute dbo.FileTypes_Delete_ById
+						@Id 
+
+			Execute dbo.FileTypes_Select_ById @Id 
+
+*/
+
+
+BEGIN
+
+			DELETE FROM [dbo].[FileTypes]
+
+			WHERE Id = @id
+
+END
+
+
