@@ -1,0 +1,22 @@
+ALTER PROC [dbo].[PrivateBooking_Delete]
+			@Id int = 5
+
+AS
+ 
+/* --- TEST CODE ---
+
+	DECLARE @Id int = 1
+
+	EXECUTE dbo.PrivateBooking_Delete @Id
+
+	SELECT *
+	FROM dbo.PrivateBooking
+
+*/
+
+BEGIN
+
+DELETE FROM [dbo].[PrivateBooking]
+      WHERE Id = @Id 
+
+END
