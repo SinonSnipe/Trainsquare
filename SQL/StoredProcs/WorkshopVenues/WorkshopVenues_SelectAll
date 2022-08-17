@@ -1,0 +1,16 @@
+ALTER proc [dbo].[WorkshopVenues_SelectAll] 
+as
+/*
+EXEC [dbo].[WorkshopVenues_SelectAll] 
+*/
+BEGIN
+		SELECT Id 
+			  ,Name 
+			 
+			   
+		
+		FROM dbo.Venues 
+			
+				
+
+END
