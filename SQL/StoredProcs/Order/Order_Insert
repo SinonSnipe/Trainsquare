@@ -1,0 +1,84 @@
+ALTER PROCEDURE [dbo].[Order_Insert] 
+				@PaymentStatusId INT
+				,@TrackingCode NVARCHAR(100)
+				,@TrackingUrl NVARCHAR(200)
+				,@Total DECIMAL(18,2)
+				,@ShippingAddressId INT
+				,@ChargeId NVARCHAR(200)
+				,@BillingAddressId INT
+				,@PaymentMethod NVARCHAR(50)
+				,@PhoneNumber NVARCHAR(50)
+				,@SessionId NVARCHAR(50)
+				,@UserId INT
+				,@Id INT OUTPUT
+
+AS
+
+/* ----- Test Code -----
+
+	DECLARE     @PaymentStatusId INT = 1
+				,@TrackingCode NVARCHAR(100) = NULL
+				,@TrackingUrl NVARCHAR(200) = NULL
+				,@Total DECIMAL(18,2) = 100.52
+				,@ShippingAddressId INT = NULL
+				,@ChargeId NVARCHAR(200) = 'charge_1'
+				,@BillingAddressId INT = NULL
+				,@PaymentMethod NVARCHAR(50) = 'Card'
+				,@PhoneNumber NVARCHAR(50) = NULL
+				,@SessionId NVARCHAR(50) = NULL
+				,@UserId INT = 261
+				,@Id INT = 0
+
+	SELECT * FROM dbo.Orders
+
+	EXECUTE dbo.Order_Insert
+				 @PaymentStatusId
+				,@TrackingCode
+				,@TrackingUrl 
+				,@Total
+				,@ShippingAddressId
+				,@ChargeId
+				,@BillingAddressId
+				,@PaymentMethod
+				,@PhoneNumber
+				,@SessionId
+				,@UserId
+				,@Id OUTPUT
+	
+	SELECT * FROM dbo.Orders
+
+----- End Test Code -----
+*/
+
+BEGIN
+
+	INSERT INTO [dbo].[Orders]
+			   ([PaymentStatusId]
+			   ,[TrackingCode]
+			   ,[TrackingUrl]
+			   ,[Total]
+			   ,[ShippingAddressId]
+			   ,[ChargeId]
+			   ,[BillingAddressId]
+			   ,[PaymentMethod]
+			   ,[PhoneNumber]
+			   ,[SessionId]
+			   ,[CreatedBy]
+			   ,[ModifiedBy])
+		 VALUES
+			   (@PaymentStatusId
+				,@TrackingCode
+				,@TrackingUrl 
+				,@Total
+				,@ShippingAddressId
+				,@ChargeId
+				,@BillingAddressId
+				,@PaymentMethod
+				,@PhoneNumber
+				,@SessionId
+				,@UserId
+				,@UserId)
+
+	SET @Id = SCOPE_IDENTITY()
+
+END
