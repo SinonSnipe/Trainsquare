@@ -1,0 +1,52 @@
+ALTER proc [dbo].[NewsletterContent_Insert]
+				@Id int OUTPUT
+				,@TemplateKeyId int
+				,@NewsletterId int
+				,@Value nvarchar(max)
+				,@CreatedBy int
+
+
+AS 
+
+/*
+
+DECLARE			@Id int = 0
+				,@TemplateKeyId int = 1
+				,@NewsletterId int = 8
+				,@Value nvarchar(max) = 'Newsletter Content value here'
+				,@CreatedBy int = 13
+
+EXECUTE [dbo].[NewsletterContent_Insert]
+				@Id OUTPUT
+				,@TemplateKeyId 
+				,@NewsletterId 
+				,@Value 
+				,@CreatedBy 
+
+EXECUTE [dbo].[NewsletterContent_Select_ById] @Id
+
+
+
+				
+
+
+
+*/
+
+BEGIN
+
+INSERT INTO [dbo].[NewsletterContent]
+           ([TemplateKeyId]
+           ,[NewsletterId]
+           ,[Value]
+           ,[CreatedBy])
+     VALUES
+           (@TemplateKeyId
+           ,@NewsletterId
+           ,@Value
+           ,@CreatedBy)
+
+SET			@Id = SCOPE_IDENTITY()
+
+END
+
