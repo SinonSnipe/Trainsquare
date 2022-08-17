@@ -1,0 +1,22 @@
+ALTER PROC [dbo].[ShoppingCart_Delete_ById]
+		@Id int
+
+AS 
+
+/*
+
+Declare @Id int = 30
+
+Execute dbo.ShoppingCart_Delete_ById @Id
+
+Select *
+From dbo.ShoppingCart
+
+*/
+
+BEGIN
+
+DELETE FROM [dbo].[ShoppingCart]
+WHERE Id = @Id
+
+END
