@@ -1,0 +1,26 @@
+ALTER proc [dbo].[EntityTypes_Insert]
+				@Id int OUTPUT
+				,@Name nvarchar(100)
+
+/*
+
+	Declare @Id int
+			,@Name nvarchar(100) = 'Venue'
+
+	Execute [dbo].[EntityTypes_Insert]
+			@Id OUTPUT
+			,@Name
+
+*/
+
+as
+BEGIN
+
+	INSERT INTO [dbo].[EntityTypes]
+				([Name])
+	VALUES		
+				(@Name)
+	SET @Id = SCOPE_IDENTITY()
+
+
+END
