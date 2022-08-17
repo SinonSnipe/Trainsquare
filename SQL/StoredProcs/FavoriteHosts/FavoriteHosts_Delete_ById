@@ -1,0 +1,30 @@
+ALTER proc [dbo].[FavoriteHosts_Delete_ById]
+				
+			@WorkShopId int,
+			@HostId int
+
+
+/*--------------  TEST CODE  ------------------
+
+	SELECT *
+	FROM dbo.FavoriteHosts
+
+	Declare @Id int = 2
+		   
+	Execute [dbo].[FavoriteHosts_Delete_ById] 
+			@Id
+		  
+	SELECT *
+	FROM dbo.FavoriteHosts
+
+--------------  TEST CODE  ------------------*/
+
+as
+
+BEGIN
+
+DELETE FROM [dbo].[FavoriteHosts]
+      WHERE WorkShopId = @WorkShopId 
+		AND HostId = @HostId
+
+END
