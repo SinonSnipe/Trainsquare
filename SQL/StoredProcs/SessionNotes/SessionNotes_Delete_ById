@@ -1,0 +1,28 @@
+ALTER proc [dbo].[SessionNotes_Delete_ById]
+			@Id int
+
+as 
+
+/*
+
+DECLARE		@Id int = 2
+
+select * 
+from dbo.SessionNotes
+
+
+EXECUTE dbo.SessionNotes_Delete_ById @Id
+
+
+select *
+from dbo.SessionNotes
+
+*/
+
+begin
+
+DELETE FROM [dbo].[SessionNotes]
+Where Id = @Id
+
+
+end 
