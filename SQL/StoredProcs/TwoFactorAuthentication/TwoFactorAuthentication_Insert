@@ -1,0 +1,46 @@
+ALTER proc [dbo].[TwoFactorAuthentication_Insert]
+				@UserId int 
+				,@PhoneNumber varchar(15)				
+				,@TwoFactorTypeId int
+				,@Id int OUTPUT
+/*----------------------TEST----------------------------------
+
+Select *
+From dbo.TwoFactorAuthentication
+
+DECLARE @Id int = 0
+
+DECLARE @UserId int						= '262'
+		,@PhoneNumber varchar(15)		= '+19292440524'		
+		,@TwoFactorTypeId	int			= '1'
+
+EXECUTE dbo.TwoFactorAuthentication_Insert @UserId
+											,@PhoneNumber											
+											,@TwoFactorTypeId
+											,@Id OUTPUT
+Select *
+From dbo.TwoFactorAuthentication
+
+*/
+as
+
+
+BEGIN
+
+
+INSERT INTO dbo.TwoFactorAuthentication
+			([UserId]
+           ,[PhoneNumber]                
+           ,[TwoFactorTypeId]		   
+		   )
+           
+
+VALUES		(@UserId
+			,@PhoneNumber			
+			,@TwoFactorTypeId)
+
+SET @Id = SCOPE_IDENTITY()
+
+
+END
+
