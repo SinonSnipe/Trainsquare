@@ -1,0 +1,48 @@
+ALTER PROC [dbo].[WorkShopRegistrationEmail_SelectAllByWorkshopId]
+
+			@WorkshopId int
+			, @UserId int
+
+AS
+
+/*
+
+	DECLARE @WorkshopId int = 5
+			, @Userid int = 261
+
+	EXECUTE	[dbo].[WorkShopRegistrationEmail_SelectAllByWorkshopId]
+			@WorkshopId
+			, @UserId
+
+*/
+
+BEGIN
+
+	SELECT	ws.[Id]  AS WorkshopId
+			, ws.[Name] AS WorkshopName
+			, ws.[ImageUrl] AS WorkshopImage
+			, ws.[DateStart]
+			, ws.[DateEnd]
+			, u.[Email] AS UserEmail
+			, wrs.[StatusId] AS UserRegistrationStatusId		
+			, wrs.[RegistrationStatus] AS UserRegistrationStatus
+			, v.[Name] AS VenueName
+			, v.[Url] AS VenueUrl
+			, vl.[LineOne]
+			, vl.[LineTwo]
+			, vl.[City]
+			, vl.[StateId]
+			, hu.FirstName AS HostFName
+			, hu.LastName AS HostLName
+
+	FROM	[dbo].[WorkShop] AS ws 
+			LEFT JOIN [dbo].[WorkshopRegistration] AS wr ON ws.Id = wr.WorkshopId
+			LEFT JOIN [dbo].[WorkshopRegistrationStatus] AS wrs ON wr.StatusId = wrs.StatusId
+			INNER JOIN [dbo].[Users] AS u ON wr.UserId = u.Id
+			INNER JOIN [dbo].[Venues] AS v ON ws.VenueId = v.Id
+			INNER JOIN [dbo].[Locations] AS vl ON v.LocationId = vl.Id
+			INNER JOIN [dbo].[UserProfiles] AS hu ON ws.HostId = hu.UserId
+
+	WHERE	WorkshopId = @WorkshopId
+
+END
