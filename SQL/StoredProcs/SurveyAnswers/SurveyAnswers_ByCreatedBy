@@ -1,0 +1,45 @@
+ALTER proc [dbo].[SurveyAnswers_ByCreatedBy]
+									@UserId int
+									,@pageIndex int 
+									,@pageSize int
+AS
+
+/* TEST CODE
+
+			Declare 
+					@UserId int = 1
+					,@pageIndex int = 0
+					,@pageSize int = 10
+
+			Execute dbo.SurveyAnswers_ByCreatedBy
+					@UserId 
+					,@pageIndex
+					,@pageSize
+
+*/
+
+BEGIN
+
+			Declare @offset int = @pageIndex * @pageSize
+
+			SELECT sa.[Id]
+				  ,sq.UserId as CreatedBy
+				  ,[InstanceId]
+				  ,[QuestionId]
+				  ,[AnswerOptionId]
+				  ,[Answer]
+				  ,[AnswerNumber]
+				  ,sa.[DateCreated]
+				  ,sa.[DateModified]
+				  ,[TotalCount] = COUNT(1) OVER()
+			  FROM [dbo].[SurveyAnswers] as sa inner join dbo.SurveyQuestions as sq
+										on sa.QuestionId = sq.Id
+
+			  WHERE sq.UserId = @UserId
+
+			ORDER BY id
+
+			OFFSET @offset Rows
+			Fetch Next @pageSize Rows ONLY
+
+END
