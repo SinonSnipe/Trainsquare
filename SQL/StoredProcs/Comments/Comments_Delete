@@ -1,0 +1,19 @@
+ALTER proc [dbo].[Comments_Delete]
+				@Id int
+
+/*
+
+	Declare @Id int = 1
+
+	Execute [dbo].[Comments_Delete] @Id
+
+*/
+
+as
+BEGIN
+
+	DELETE 
+	FROM  [dbo].[Comments]
+	WHERE Id = @Id
+
+END
