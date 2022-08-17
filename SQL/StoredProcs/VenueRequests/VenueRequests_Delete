@@ -1,0 +1,25 @@
+ALTER proc [dbo].[VenueRequests_Delete] 
+									@Id int
+
+as 
+
+/*
+
+	Declare @Id int = 84
+
+	Select * 
+	From dbo.VenueRequests
+
+	Execute dbo.VenueRequests_Delete
+									@Id
+	Select * 
+	From dbo.VenueRequests
+
+*/
+
+BEGIN
+
+	DELETE FROM [dbo].[VenueRequests]
+    WHERE Id = @Id
+
+END 
