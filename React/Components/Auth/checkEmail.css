@@ -1,0 +1,22 @@
+.center {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.formContainer {
+    width: 35rem;
+}
+
+.header {
+    background-color: #727cf5;
+}
+
+.header-font {
+    color: white;
+}
+html {
+    background: url('../../assets/images/bg-pattern-light.svg') center;
+    background-size: cover;
+}

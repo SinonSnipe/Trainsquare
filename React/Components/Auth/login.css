@@ -1,0 +1,41 @@
+.has-error {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: crimson;
+}
+
+html {
+    background: url('../../assets/images/bg-pattern-light.svg') center;
+    background-size: cover;
+}
+
+.center {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.formContainer {
+    width: 35rem;
+}
+
+.header {
+    background-color: #727cf5;
+}
+
+.header-font {
+    color: white;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.authBack {
+    background: url('../../assets/images/bg-pattern-light.svg') center;
+    background-size: cover;
+
+    height: 100%;
+}
