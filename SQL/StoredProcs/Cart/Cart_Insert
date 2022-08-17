@@ -1,0 +1,31 @@
+ALTER PROCEDURE [dbo].[Cart_Insert] 
+						@CustomerId INT
+						,@Id INT OUTPUT
+
+AS
+
+/* ----- Test Code -----
+
+	DECLARE @CustomerId INT = 1
+			,@Id INT = 0
+
+	EXECUTE dbo.Cart_Insert
+						@CustomerId
+						,@Id OUTPUT
+	
+	SELECT * FROM dbo.Cart
+
+----- End Test Code -----
+*/
+
+BEGIN
+
+
+	INSERT INTO [dbo].[Cart]
+			   ([CustomerId])
+		 VALUES
+			   (@CustomerId)
+
+	SET @Id = SCOPE_IDENTITY()
+
+END
