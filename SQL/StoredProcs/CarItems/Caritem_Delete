@@ -1,0 +1,28 @@
+ALTER PROCEDURE [dbo].[CartItem_Delete] 
+						@Id INT
+						
+
+AS
+
+/* ----- Test Code -----
+
+	DECLARE @Id INT = 9
+
+	SELECT * FROM dbo.CartItems
+	WHERE Id = @Id
+
+	EXECUTE dbo.CartItem_Delete
+						@Id
+
+	SELECT * FROM dbo.CartItems
+	WHERE Id = @Id
+
+----- End Test Code -----
+*/
+
+BEGIN
+
+	DELETE dbo.CartItems
+	WHERE Id = @Id
+
+END
