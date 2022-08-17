@@ -1,0 +1,18 @@
+ALTER proc [dbo].[WorkShop_Delete]
+		@Id int
+
+/*
+	Declare @Id int = 
+
+	Execute dbo.WorkShop_Delete @Id 
+
+*/
+
+as
+BEGIN
+
+	DELETE
+	FROM dbo.WorkShop
+	Where Id = @Id 
+
+END 
