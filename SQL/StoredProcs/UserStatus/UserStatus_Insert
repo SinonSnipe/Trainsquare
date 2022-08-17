@@ -1,0 +1,31 @@
+ALTER PROC [dbo].[UserStatus_Insert]
+				@Name nvarchar(30)
+				,@Id int OUTPUT
+
+AS
+/*
+	DECLARE @Id int = 1
+
+	DECLARE @Name nvarchar(30) = 'Active'
+
+	EXECUTE [dbo].[UserStatus_Insert]
+			@Name
+			,@Id OUTPUT
+
+
+*/
+BEGIN
+	SET IDENTITY_INSERT [dbo].[UserStatus] ON
+
+		INSERT INTO [dbo].[UserStatus]
+				   ([Id]
+				   ,[Name])
+
+			 VALUES(@Id
+					,@Name)
+
+	SET @Id = SCOPE_IDENTITY()
+
+	SET IDENTITY_INSERT [dbo].[UserStatus] OFF
+
+END
