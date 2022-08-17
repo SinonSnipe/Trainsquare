@@ -1,0 +1,33 @@
+.card-details {
+
+font-family:'Times New Roman', Times, serif ;    
+
+}
+
+.card-text {
+
+    font-family:'Times New Roman', Times, serif ;    
+
+}
+
+.start-date{
+
+
+font-size: 10px;
+align-content:flex-end  ;
+
+}
+
+.text-smaller{
+
+font-size: smaller;
+cursor: pointer;
+color: blue;
+
+}
+
+.drop {
+    border: 1px solid #DEE2E6 !important;
+    width: 100%;
+}
+
