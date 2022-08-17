@@ -1,0 +1,114 @@
+import React, { useState, useEffect } from 'react';
+import debug from 'sabio-debug';
+import { Card, Pagination } from 'react-bootstrap';
+import * as blogsService from '../../services/blogsService';
+import BlogsCard from './BlogsCard';
+import locale from 'rc-pagination/lib/locale/en_US';
+import 'rc-pagination/assets/index.css';
+import './blog.css'
+
+const _logger = debug.extend('Blogs');
+
+function Blog() {
+    const [blogsList, setBlogsList] = useState({
+        blogs: [],
+        arrayOfBlogs: [],
+        current: 0,
+        index: 0,
+        size: 0,
+        totalCount: '',
+        totalPages: '',
+    });
+
+    const [page, setPage] = useState({
+        current: 0,
+        index: 0,
+        size: 8,
+        query: '',
+        items: [],
+    });
+
+    _logger(setPage, 'Pagination');
+    _logger(locale);
+
+    useEffect(() => {
+        blogsService.paginate(page.index, page.size, page.query).then(onGetBlogSuccess).catch(onGetBlogError);
+    }, []);
+
+    const onGetBlogSuccess = (response) => {
+        _logger(response);
+        let current = response.item.current + 1;
+        let pageIndex = response.item.pageIndex;
+        let pageSize = response.item.pageSize;
+        let totalPages = response.item.totalPages;
+        let listOfBlogs = response.item.pagedItems;
+        let query = response.item.query;
+
+        setBlogsList((prev) => {
+            const newAr = { ...prev };
+            newAr.blogs = listOfBlogs;
+            newAr.current = current;
+            newAr.pageIndex = pageIndex;
+            newAr.pageSize = pageSize;
+            newAr.query = query;
+            newAr.totalPages = totalPages;
+            newAr.arrayOfBlogs = listOfBlogs.map(mapBlogs);
+            return newAr;
+        });
+    };
+
+    const onGetBlogError = (err) => {
+        _logger(err);
+    };
+
+    const mapBlogs = (blogs) => {
+        _logger(blogs);
+        return <BlogsCard key={blogs.id} blogs={blogs} />;
+    };
+
+    const renderCards = () => {
+        return blogsList.arrayOfBlogs;
+    };
+
+    const onPrevClick = () => {
+        setPage((prevState) => {
+            let pd = { ...prevState };
+            pd.current = prevState.current - 1;
+            pd.index = prevState.index - 1;
+            return pd;
+        });
+    };
+    const onNextClick = () => {
+        setPage((prevState) => {
+            let pd = { ...prevState };
+            pd.current = prevState.current + 1;
+            pd.index = prevState.index + 1;
+            return pd;
+        });
+    };
+
+    return (
+        <React.Fragment>
+            <Card>
+                <div className="container">
+                    <div className="row">
+                        <div className="page-title-box">
+                            <h1 className='card-text text-left'>Community Blogs</h1>
+                        </div>
+
+                        <div className="row">{renderCards()}</div>
+                    </div> 
+                        <div>
+                        <Pagination>
+                        <Pagination.Prev onClick={onPrevClick} />
+                        {page.items}
+                        <Pagination.Next onClick={onNextClick} />
+                    </Pagination>
+                        </div>
+                </div>
+            </Card>
+        </React.Fragment>
+    );
+}
+
+export default Blog;
