@@ -1,0 +1,294 @@
+import React, { useState, useEffect } from 'react';
+import debug from 'sabio-debug';
+import { Row, Col, Card, Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+
+import * as helper from '../../services/serviceHelpers';
+import CartSummary from './CartSummary';
+import * as paymentService from '../../services/paymentService';
+import * as cartService from '../../services/cartService';
+import * as cartItemService from '../../services/cartItemsService';
+import * as inventoryService from '../../services/inventoryService';
+import toastr from '../../utils/toastr.js';
+import Swal from 'sweetalert2';
+import Loader from '../Loader';
+
+const _logger = debug.extend('Cart');
+
+const Cart = () => {
+    const [disable, setDisable] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const [cart, setCart] = useState({
+        cartItems: [],
+    });
+
+    const [summary, setSummary] = useState({
+        grossTotal: 0,
+        discount: 0,
+        tax: 0,
+        netTotal: 0,
+    });
+
+    useEffect(() => {
+        cartService.getCartByCustomer().then(onGetCartSuccess).catch(onGetCartError);
+    }, []);
+
+    const onGetCartError = (err) => {
+        _logger(err);
+        toastr.error('Error loading the cart', 'Error');
+        setLoading(false);
+    };
+
+    const onGetCartSuccess = (cart) => {
+        setCart((prevState) => {
+            const newState = { ...prevState };
+            newState.cartItems = cart.items;
+            return newState;
+        });
+
+        setSummary((prevState) => {
+            const newState = { ...prevState };
+
+            let totalCouter = 0;
+
+            if (!cart.items) {
+                return newState;
+            }
+
+            cart.items.forEach((item) => {
+                totalCouter += item.basePrice * item.quantity;
+            });
+
+            newState.grossTotal = totalCouter;
+            newState.netTotal = newState.grossTotal - newState.discount + newState.tax;
+
+            return newState;
+        });
+
+        setLoading(false);
+    };
+
+    const onQtyChange = async (e, item) => {
+        e.preventDefault();
+        var newQuantity = e.target.value;
+
+        const currentInventory = await inventoryService.getById(item.inventoryId);
+        const stock = currentInventory.data.item.quantity;
+
+        if (!currentInventory) {
+            toastr.error('This item does not exists.', 'Error');
+            return;
+        }
+
+        if (stock >= newQuantity) {
+            const payload = {
+                quantity: newQuantity,
+                inventoryId: item.inventoryId,
+                cartId: item.cartId,
+            };
+
+            cartItemService.updateCartItem(item.id, payload).then(() => {
+                var localItems = [...cart.cartItems];
+                var idx = localItems.findIndex((i) => i.id === item.id);
+                localItems[idx] = { ...item, quantity: newQuantity };
+                adjustCart(localItems);
+                toastr.success('Quantity updated');
+            });
+        } else {
+            toastr.error('No more stock.', 'Stock');
+            _logger('Not enough stock');
+        }
+    };
+
+    const removeItem = (e, item) => {
+        e.preventDefault();
+
+        if (disable) {
+            return;
+        }
+
+        Swal.fire({
+            title: 'Do you want to remove this item?',
+            text: item.name,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cartItemService.deleteById(item.id).then(() => {
+                    toastr.success('Item removed from cart');
+                    var localItems = cart.cartItems.filter((i) => i.id !== item.id);
+                    adjustCart(localItems);
+                });
+            }
+        });
+    };
+
+    const adjustCart = (localItems) => {
+        var newGrossTotal = 0;
+        for (const item of localItems) {
+            newGrossTotal += item.basePrice * item.quantity;
+        }
+
+        var newNetTotal = newGrossTotal - summary.discount + summary.tax;
+
+        setCart((prevState) => {
+            const newState = { ...prevState };
+            newState.cartItems = localItems;
+
+            return newState;
+        });
+
+        setSummary({
+            ...summary,
+            grossTotal: newGrossTotal,
+            netTotal: newNetTotal,
+        });
+    };
+
+    const onCheckout = async (e) => {
+        e.preventDefault();
+
+        setDisable(true);
+        document.body.style.cursor = 'wait';
+
+        const session = await paymentService.createCheckoutSession();
+        const stripe = await loadStripe(helper.STRIPE_API_KEY);
+        stripe.redirectToCheckout({ sessionId: session.item.id });
+    };
+
+    return (
+        <>
+            {loading ? (
+                <Loader />
+            ) : (
+                <div>
+                    <h1 className="m-4 text-dark">Shopping Cart</h1>
+
+                    <Row>
+                        <Col xs={12}>
+                            <Card>
+                                {!cart.cartItems?.length > 0 ? (
+                                    <Card.Body className="text-center">
+                                        <h3 className="m-4 text-dark">No cart items!</h3>
+                                    </Card.Body>
+                                ) : (
+                                    <Card.Body>
+                                        <Row>
+                                            <Col lg={8}>
+                                                <Table
+                                                    responsive
+                                                    borderless
+                                                    className="table-centered table-nowrap mb-0">
+                                                    <thead className="table-light">
+                                                        <tr>
+                                                            <th>Product</th>
+                                                            <th>Price</th>
+                                                            <th>Quantity</th>
+                                                            <th>Total</th>
+                                                            <th style={{ width: '50px' }}></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {cart.cartItems &&
+                                                            cart.cartItems.map((item, idx) => {
+                                                                return (
+                                                                    <tr key={idx}>
+                                                                        <td>
+                                                                            <img
+                                                                                src={item.imageUrl}
+                                                                                alt={item.name}
+                                                                                title="contact-img"
+                                                                                className="rounded me-3"
+                                                                                height="64"
+                                                                            />
+
+                                                                            <p className="m-0 d-inline-block align-middle font-16">
+                                                                                <Link to="#" className="text-body">
+                                                                                    {item.name}
+                                                                                </Link>
+                                                                                <br />
+                                                                                <small className="me-2">
+                                                                                    <b>Description:</b> {item.summary}{' '}
+                                                                                </small>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>${item.basePrice.toFixed(2)}</td>
+                                                                        <td>
+                                                                            <input
+                                                                                type="number"
+                                                                                min="1"
+                                                                                value={item.quantity}
+                                                                                className="form-control"
+                                                                                placeholder="Qty"
+                                                                                style={{ width: '90px' }}
+                                                                                onChange={(e) => {
+                                                                                    onQtyChange(e, item);
+                                                                                }}
+                                                                                disabled={disable}
+                                                                            />
+                                                                        </td>
+                                                                        <td>
+                                                                            $
+                                                                            {(item.basePrice * item.quantity).toFixed(
+                                                                                2
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            <Link
+                                                                                to="#"
+                                                                                className="action-icon"
+                                                                                onClick={(e) => {
+                                                                                    removeItem(e, item);
+                                                                                }}>
+                                                                                {' '}
+                                                                                <i className="mdi mdi-delete"></i>
+                                                                            </Link>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                    </tbody>
+                                                </Table>
+
+                                                <Row className="mt-4">
+                                                    <Col sm={6}>
+                                                        <Link
+                                                            to="/"
+                                                            className="btn text-muted d-none d-sm-inline-block btn-link fw-semibold">
+                                                            <i className="mdi mdi-arrow-left"></i> Continue Shopping{' '}
+                                                        </Link>
+                                                    </Col>
+                                                    <Col sm={6}>
+                                                        <div className="text-sm-end">
+                                                            <button
+                                                                disabled={disable}
+                                                                onClick={onCheckout}
+                                                                className="btn btn-danger">
+                                                                <i className="mdi mdi-cart-plus me-1"></i> Checkout{' '}
+                                                            </button>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+
+                                            <Col lg={4}>
+                                                <CartSummary summary={summary} />
+                                            </Col>
+                                        </Row>
+                                    </Card.Body>
+                                )}
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default Cart;
