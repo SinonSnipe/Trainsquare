@@ -1,0 +1,188 @@
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { React, useState, useEffect } from 'react';
+import debug from 'sabio-debug';
+import newsletterSchema from '../../schema/newsletterSchema';
+import { Link } from 'react-router-dom';
+import * as newslettersService from '../../services/newslettersService';
+import * as newsletterTemplatesService from '../../services/newsletterTemplatesService';
+import { Card, Col, Row } from 'react-bootstrap';
+import toastr from '../../utils/toastr';
+import PropTypes from 'prop-types';
+import Dropzone from '../files/Dropzone';
+
+const NewNewsletter = () => {
+    const _logger = debug.extend('newsletter form');
+
+    const [formData, setFormData] = useState({
+        templateId: '',
+        name: '',
+        coverPhoto: '',
+        dateToPublish: '',
+        dateToExpire: '',
+    });
+
+    useEffect(() => {
+        _logger('firing useEffect for get Newsletter');
+        newsletterTemplatesService
+            ?.paginated(0, 30)
+            .then(onGetNewsletterTemplatesSuccess)
+            .catch(onGetNewsletterTemplatesError);
+    }, []);
+
+    const onGetNewsletterTemplatesSuccess = (response) => {
+        _logger('get news temps success', response.item.pagedItems);
+
+        let arOfTemps = response.item.pagedItems;
+
+        setFormData((prevState) => {
+            const pd = { ...prevState };
+            pd.arrayOfTemplatesComponents = arOfTemps?.map(mapNewsletterTemplate);
+            _logger(arOfTemps);
+
+            return pd;
+        });
+    };
+
+    const onGetNewsletterTemplatesError = (err) => {
+        _logger(err);
+    };
+    const mapNewsletterTemplate = (aNewsTemp) => {
+        return (
+            <option value={aNewsTemp.id} key={aNewsTemp.id} type="text">
+                {aNewsTemp.name}
+            </option>
+        );
+    };
+
+    const handleSubmit = (values) => {
+        _logger('news values', values);
+        values.templateId = parseInt(values.templateId);
+        newslettersService.add(values).then(onSuccessAddNewsletter).catch(onErrorAddNewsletter);
+    };
+
+    const onSuccessAddNewsletter = (response) => {
+        _logger('Create Newsletter', response);
+
+        toastr.success('Congrats your newsletter was created!');
+    };
+    const onErrorAddNewsletter = (err) => {
+        _logger(err);
+        toastr.error('Unsuccessful. Please try again.');
+    };
+
+    return (
+        <>
+            <div className="container">
+                <div className="row">
+                    <h2 className="gap-2 d-md-flex justify-content-center">Create Newsletter</h2>
+                    <Link className="to-news" to="/newsletter" align="center">
+                        <i className="mdi mdi-arrow-left-thick"></i>
+                        Back to Newsletters
+                    </Link>
+                </div>
+
+                <Formik
+                    enableReinitialize={true}
+                    initialValues={formData}
+                    onSubmit={handleSubmit}
+                    validationSchema={newsletterSchema}>
+                    {({ values, setFieldValue }) => (
+                        <Form>
+                            <Row>
+                                <Col lg={6}>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="name">Newsletter Name</label>
+                                        <Field type="text" name="name" className="form-control" />
+                                        <ErrorMessage name="name" component="div" className="newsletter-inputField" />
+                                    </div>
+
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="templateId">Select Template</label>
+                                        <Field as="select" name="templateId" className="form-control">
+                                            <option>Please Select</option>
+
+                                            {formData.arrayOfTemplatesComponents}
+                                        </Field>
+
+                                        <ErrorMessage
+                                            name="templateId"
+                                            component="div"
+                                            className="newsletter-inputField"
+                                        />
+                                    </div>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="dateToPublish">Publish Date</label>
+                                        <Field type="text" name="dateToPublish" className="form-control" />
+                                        <ErrorMessage
+                                            name="dateToPublish"
+                                            component="div"
+                                            className="newsletter-inputField"
+                                        />
+                                    </div>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="dateToExpire">Expiry Date</label>
+                                        <Field type="text" name="dateToExpire" className="form-control" />
+                                        <ErrorMessage
+                                            name="dateToExpire"
+                                            component="div"
+                                            className="newsletter-inputField"
+                                        />
+                                    </div>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="coverPhoto">Upload Cover Image</label>
+                                        <Dropzone
+                                            uploadedFiles={(fileData) => {
+                                                setFieldValue('coverPhoto', fileData[0].url);
+                                            }}
+                                        />
+                                        <ErrorMessage
+                                            name="coverPhoto"
+                                            component="div"
+                                            className="newsletter-inputField"
+                                        />
+                                    </div>
+                                    <div className="col-md-12 p-1" align="center">
+                                        <button type="submit" className="btn btn-primary">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Col>
+
+                                <Col xl={4}>
+                                    <Card className="p-2 mb-2">
+                                        <Card.Header as="h4">{values?.name}</Card.Header>
+                                        <img
+                                            alt="CoverPhoto"
+                                            className="card-img-top img-fluid"
+                                            style={{ width: '100%', height: '23vw', ObjectFit: 'cover' }}
+                                            src={values?.coverPhoto || 'https://bit.ly/39lFAz2'}
+                                        />
+
+                                        <Card.Body>
+                                            <Card.Footer>
+                                                <p>{`Publish Date: ${new Date(
+                                                    values?.dateToPublish
+                                                ).toDateString()}`}</p>
+                                                <p>{`Expire Date: ${new Date(values?.dateToExpire).toDateString()}`}</p>
+                                            </Card.Footer>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </>
+    );
+};
+NewNewsletter.propTypes = {
+    formData: PropTypes.shape({
+        templateId: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        dateToPublish: PropTypes.string.isRequired,
+        dateToExpire: PropTypes.string.isRequired,
+    }),
+};
+
+export default NewNewsletter;
