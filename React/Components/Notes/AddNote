@@ -1,0 +1,176 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Form, Card } from 'react-bootstrap';
+import toastr from '../../utils/toastr';
+import debug from 'sabio-debug';
+import noteService from '../../services/noteService';
+import lookup from '../../services/lookupService';
+
+const _logger = debug.extend('AddNote');
+
+function AddNote() {
+    const navigate = useNavigate();
+
+    const [formInfo, setFormInfo] = useState({
+        workShop: '',
+        workShopId: null,
+        tagsTypeId: '',
+        notes: '',
+        dateCreated: '',
+    });
+    const [tagsContent, setTagsContent] = useState([]);
+
+    useEffect(() => {
+        lookup(['TagsTypes']).then(onLookupSuccess).catch(onLookupError);
+    }, []);
+    const onLookupSuccess = (response) => {
+        _logger(response, 'Tag content');
+
+        setTagsContent((prevState) => {
+            let newType = { ...prevState };
+            newType = response.item.tagsTypes;
+            return newType;
+        });
+    };
+    const onLookupError = (response) => {
+        _logger(response, 'error retrieving lookup table');
+    };
+
+    const onFormChange = (e) => {
+        const target = e.target;
+        const newFieldValue = target.value;
+        _logger(newFieldValue);
+        const nameOfField = target.name;
+
+        const updatedFormData = { ...formInfo };
+        updatedFormData[nameOfField] = newFieldValue;
+
+        setFormInfo(updatedFormData);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        debugger;
+        _logger('adding note requested', e);
+        noteService.add(formInfo).then(onAddSuccess).catch(onAddError);
+    };
+
+    const onAddSuccess = (response) => {
+        toastr.success('Note Successfully Added');
+        window.location.replace('/notes');
+        _logger(response, 'ADD WORKS');
+    };
+
+    const onAddError = (error) => {
+        toastr.error('Unable to Add New Note');
+        _logger(error);
+    };
+
+    const mapType = (type, index) => (
+        <option value={type.id} key={`${type}_${index}`}>
+            {type.name}
+        </option>
+    );
+
+    const cancelNote = () => {
+        _logger('add Note');
+        navigate(`/notes`);
+    };
+
+    return (
+        <React.Fragment>
+            <div className="container-fluid">
+                <Card className="mx-5 my-4">
+                    <Card.Header>
+                        <h2 className="text-center">Create Your Workshop Note</h2>
+                    </Card.Header>
+                    <Card.Body>
+                        <div className="form-group my3">
+                            <div className="row">
+                                <div className="col-12">
+                                    <Form onSubmit={handleSubmit}>
+                                        <div className="form-group mb-3 my-2 mx-2">
+                                            <label htmlFor="workShop">Workshop</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={formInfo.workShop}
+                                                onChange={onFormChange}
+                                                placeholder="Enter Workshop Name"
+                                                name="workShop"
+                                            />
+                                        </div>
+
+                                        <div className="form-group mb-3 my-2 mx-2">
+                                            <label htmlFor="workShopId">Workshop Id</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={formInfo.workShopId}
+                                                onChange={onFormChange}
+                                                placeholder="Enter Workshop Id"
+                                                name="workShopId"
+                                            />
+                                        </div>
+
+                                        <div className="form-group mb-3  my-2 mx-2">
+                                            <label htmlFor="tagsTypeId">Workshop Tag </label>
+                                            <select
+                                                className="form-control"
+                                                name="tagsTypeId"
+                                                onChange={onFormChange}
+                                                value={formInfo.tagsTypeId}>
+                                                <option value="">Select a Tag Type</option>
+                                                {tagsContent.map(mapType)}
+                                            </select>
+                                        </div>
+                                        <div className="form-group mb-3  my-2 mx-2">
+                                            <div>
+                                                <label htmlFor="notes">Notes</label>
+
+                                                <textarea
+                                                    className="form-control"
+                                                    name="notes"
+                                                    value={formInfo.notes}
+                                                    onChange={onFormChange}
+                                                    rows="7"
+                                                    placeholder="Enter Workshop Notes"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group mb-3 my-2 mx-2">
+                                            <label htmlFor="dateCreated">Date Created</label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={formInfo.dateCreated}
+                                                onChange={onFormChange}
+                                                name="dateCreated"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="btn btn-success ms-2 me-2 back rounded-pill shadow"
+                                            onClick={handleSubmit}>
+                                            <i className="mdi mdi-plus"></i>
+                                            Add Note
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="btn btn-secondary ms-2 me-2 back rounded-pill shadow"
+                                            onClick={cancelNote}>
+                                            Cancel
+                                        </button>
+                                    </Form>
+                                </div>
+                            </div>
+                        </div>
+                    </Card.Body>
+                </Card>
+            </div>
+        </React.Fragment>
+    );
+}
+export default AddNote;
