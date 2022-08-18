@@ -1,0 +1,129 @@
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { React, useState } from 'react';
+import debug from 'sabio-debug';
+import newsletterTemplatesSchema from '../../schema/newsletterTemplatesSchema';
+import { Link } from 'react-router-dom';
+import * as newsletterTemplatesService from '../../services/newsletterTemplatesService';
+import { Card, Col, Row } from 'react-bootstrap';
+import toastr from '../../utils/toastr';
+import PropTypes from 'prop-types';
+import Dropzone from '../files/Dropzone';
+//import lookup from '../../services/lookupService';
+
+const NewNewsletterTemplate = () => {
+    const _logger = debug.extend('template form');
+
+    const [formData] = useState({
+        name: '',
+        description: '',
+        primaryImage: '',
+    });
+
+    const handleSubmit = (values) => {
+        _logger('news temp values', values);
+
+        newsletterTemplatesService.add(values).then(onSuccessAddTemplate).catch(onErrorAddTemplate);
+    };
+
+    const onSuccessAddTemplate = (response) => {
+        _logger('Create Newsletter Template', response);
+
+        toastr.success('Congrats your newsletter template was created!');
+    };
+    const onErrorAddTemplate = (err) => {
+        _logger(err);
+        toastr.error('Unsuccessful. Please try again.');
+    };
+
+    return (
+        <>
+            <div className="container">
+                <div className="row">
+                    <h2 className="gap-2 d-md-flex justify-content-center">Create Newsletter Template</h2>
+                    <Link className="to-newsTemps" to="/newsletter/templates" align="center">
+                        <i className="mdi mdi-arrow-left-thick"></i>
+                        Back to Newsletter Templates
+                    </Link>
+                </div>
+
+                <Formik
+                    enableReinitialize={true}
+                    initialValues={formData}
+                    onSubmit={handleSubmit}
+                    validationSchema={newsletterTemplatesSchema}>
+                    {({ values, setFieldValue }) => (
+                        <Form>
+                            <Row>
+                                <Col lg={6}>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="name">Name</label>
+                                        <Field type="text" name="name" className="form-control" />
+                                        <ErrorMessage
+                                            name="name"
+                                            component="div"
+                                            className="newsletter-template-inputField"
+                                        />
+                                    </div>
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="description">Description</label>
+                                        <Field type="text" name="description" className="form-control" />
+                                        <ErrorMessage
+                                            name="description"
+                                            component="div"
+                                            className="newsletter-template-inputField"
+                                        />
+                                    </div>
+
+                                    <div className="form-group mb-2">
+                                        <label htmlFor="primaryImage">Upload Template Image</label>
+                                        <Dropzone
+                                            uploadedFiles={(fileData) => {
+                                                setFieldValue('primaryImage', fileData[0].url);
+                                            }}
+                                        />
+                                        <ErrorMessage
+                                            name="primaryImage"
+                                            component="div"
+                                            className="newsletter-template-inputField"
+                                        />
+                                    </div>
+
+                                    <div className="col-md-12 p-1" align="center">
+                                        <button type="submit" className="btn btn-primary">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Col>
+
+                                <Col lg={4}>
+                                    <Card className="p-2 mb-2">
+                                        <Card.Header as="h4"></Card.Header>
+                                        <img
+                                            alt="PrimaryImage"
+                                            className="card-img-top img-fluid"
+                                            style={{ width: '100%', height: '23vw', ObjectFit: 'cover' }}
+                                            src={values?.primaryImage || 'https://bit.ly/37KmKkE'}
+                                        />
+                                        <Card.Header as="h4">{values?.name}</Card.Header>
+                                        <Card.Body>
+                                            <Card.Text>{values?.description}</Card.Text>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </>
+    );
+};
+NewNewsletterTemplate.propTypes = {
+    formData: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+        primaryImage: PropTypes.string.isRequired,
+    }),
+};
+
+export default NewNewsletterTemplate;
