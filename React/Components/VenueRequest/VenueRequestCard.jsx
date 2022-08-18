@@ -1,0 +1,59 @@
+import React from "react";
+import PropTypes from "prop-types";
+import { Card, Col } from 'react-bootstrap';
+import debug from 'sabio-debug';
+
+
+const VenueRequestCard = (props) => {
+const _logger = debug.extend('VenueRequestCard')
+const aVenue = props.venueRequest
+let startDate = aVenue.startDate.split("T")[0]
+let formattedStartDate = startDate.split("-")[1] + "/" + startDate.split("-")[2] + "/" + startDate.split("-")[0]  
+let endDate = aVenue.endDate.split("T")[0]
+let formattedEndDate = endDate.split("-")[1] + "/" + endDate.split("-")[2] + "/" + endDate.split("-")[0]  
+
+const onLocalDeleteClicked = () => {
+    props.onDeleteClicked(aVenue.id);
+    _logger("deleted id-->", aVenue.id)
+};
+
+const onLocalEditClicked = () => {
+    props.onEditClicked(aVenue);
+    _logger("edit id-->", aVenue.id)
+};
+
+return (
+    
+    <Card className="mx-2 text-center mt-2" style={{ width: '14rem' }}>
+        <Col className="my-2">
+                <p>{aVenue.eventDescription}</p>
+                <label>{formattedStartDate} - {formattedEndDate}</label>
+        </Col>   
+        <Col>
+        <button type="button" className="btn btn-danger mx-1 btn-sm my-2" onClick={onLocalDeleteClicked}>
+                Delete
+        </button>    
+        <button type="button" className="btn btn-info mx-1 btn-sm my-2" onClick={onLocalEditClicked}>
+                Edit
+        </button>    
+        </Col>    
+    </Card>   
+);
+};
+
+VenueRequestCard.propTypes = {
+    venueRequest: PropTypes.shape({
+        venueId: PropTypes.number.isRequired,
+        endDate: PropTypes.string.isRequired,
+        startDate: PropTypes.string.isRequired,
+        eventDescription: PropTypes.string.isRequired,
+        url: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        requester: PropTypes.number.isRequired,
+        id: PropTypes.number.isRequired,
+    }),
+    onDeleteClicked: PropTypes.func,
+    onEditClicked: PropTypes.func
+};
+   
+   export default React.memo(VenueRequestCard);
