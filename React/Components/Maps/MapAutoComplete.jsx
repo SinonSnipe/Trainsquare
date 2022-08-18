@@ -1,0 +1,73 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Autocomplete, LoadScript } from '@react-google-maps/api';
+import PropTypes from 'prop-types';
+import toastr from 'toastr';
+import debug from 'sabio-debug';
+
+const _logger = debug.extend('WorkshopMap');
+const googleApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+const MapAutoComplete = () => {
+    const [autocomplete, setAutocomplete] = useState();
+
+    const navigate = useNavigate();
+
+    const onLoad = (autocomplete) => {
+        //_logger('autocomplete: ', autocomplete);
+        setAutocomplete(() => autocomplete);
+    };
+
+    const onPlaceChanged = () => {
+        if (autocomplete !== null) {
+            try {
+                const place = autocomplete.getPlace();
+                const latitude = place.geometry.location.lat();
+                const longitude = place.geometry.location.lng();
+
+                const stateForTransport = {
+                    type: 'COORDINATE_DATA',
+                    payload: { lat: latitude, lng: longitude },
+                };
+
+                navigate('/workshops/results', { state: stateForTransport });
+            } catch {
+                toastr.error('Must choose a valid google maps location from search bar.');
+            }
+        } else {
+            _logger('Autocomplete is not loaded yet.');
+        }
+    };
+
+    return (
+        <LoadScript googleMapsApiKey={googleApiKey} libraries={['places']}>
+            <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+                <div className="col" style={{ textAlign: 'center', marginLeft: 'auto', marginRight: 'auto' }}>
+                    <input
+                        type="text"
+                        placeholder="See what's happening near you."
+                        style={{
+                            // zIndex: -1,
+                            boxSizing: `border-box`,
+                            border: `1px solid transparent`,
+                            width: `60%`,
+                            height: `50px`,
+                            borderRadius: `15px`,
+                            boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                            fontSize: `14px`,
+                            outline: `none`,
+                            textOverflow: `ellipses`,
+                            padding: '20px',
+                        }}
+                    />
+                </div>
+            </Autocomplete>
+        </LoadScript>
+    );
+};
+
+MapAutoComplete.propTypes = {
+    setMapCenter: PropTypes.func,
+};
+
+export default MapAutoComplete;
