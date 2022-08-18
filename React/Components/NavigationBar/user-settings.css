@@ -1,0 +1,53 @@
+.card-text-title {
+    text-align: center;
+    font-size: 30px;
+    color: #727cf5;
+    text-shadow: 2px 2px 4px #c4c5d0;
+}
+.strong-text-email {
+    font-weight: bold;
+    font-size: large;
+    margin-top: 5;
+}
+.lg-text-pholder {
+    font-size: large;
+}
+.btn-unsub {
+    margin-top: 2rem;
+    margin-left: 37.5%;
+    width: 25%;
+    font-size: 1.1rem;
+    font-weight: bolder;
+    color: white;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+    border: 0.1rem #727cf5 solid;
+    background-color: #727cf5;
+    cursor: pointer;
+}
+.btn-hover-unsub:hover {
+    color: black;
+}
+
+.btn-hover-change:hover {
+    color: black;
+}
+.btn-cha {
+    margin-top: 2rem;
+    margin-left: 37.5%;
+    width: 25%;
+    font-size: 1.1rem;
+    font-weight: bolder;
+    color: white;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+    border: 0.1rem #727cf5 solid;
+    background-color: #727cf5;
+    cursor: pointer;
+}
+
+.modal-label-pword {
+    margin-left: 10px;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
