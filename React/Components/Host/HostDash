@@ -1,0 +1,104 @@
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Card } from 'react-bootstrap';
+import { GetProfile } from '../../services/hostService';
+import PropTypes from 'prop-types';
+import NavCard from './NavCard';
+import './host.css';
+
+import debug from 'sabio-debug';
+import { Link } from 'react-router-dom';
+const _log = debug.extend('HostDash');
+
+const HostDash = () => {
+    useEffect(() => {
+        GetProfile().then(onProfileSuccess).catch(onProfileError);
+    }, []);
+
+    const [profileDat, setProfile] = useState({});
+
+    const onProfileSuccess = (response) => {
+        _log(response);
+        const profile = response.item;
+        setProfile((prevState) => {
+            let profileDat = { ...prevState };
+            profileDat.profileData = profile;
+
+            return profileDat;
+        });
+    };
+
+    const profile = profileDat.profileData;
+
+    const onProfileError = (err) => {
+        _log(err);
+    };
+
+    return (
+        <React.Fragment>
+            <NavCard />
+
+            <Card className="align-items-center host-Intro">
+                    <h2 className="text-center">Welcome {profile?.firstName}!</h2>
+                    <p
+                        className="text-center .mx-auto"
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        This is your new home for hosting workshops with Trainsquare. Feel free to take a moment to look
+                        around and get your bearings. Check out the workshop tips on the left and the FAQ&apos;s on the
+                        right. Good luck! We just know you&apos;ll be great!
+                    </p>
+                </Card>
+
+
+
+
+            <Row>
+                <Col xs={1} />
+
+                
+
+                <Card className="host-card">
+                    <img className="host-img " src="https://media.istockphoto.com/vectors/group-of-young-business-people-working-together-vector-id1144445813?k=20&m=1144445813&s=612x612&w=0&h=u7ixs5vI543PjPxNY5mW1xXmQ6tHyTCKAQbk_cbH-1o=" alt="Learn hoe to train" />
+                    <Card.Body>
+                       
+                        <p className="card-text"> <h3>Ready to Host a Workshop?</h3> Click here to learn more about hosting and all its perks!</p>
+                    </Card.Body>
+                </Card>
+
+
+                <Card className="host-card">
+                    <Link to="/faqs" className="faqlink">
+                        <img
+                            className="host-img "
+                            src="https://www.razorsign.com/images/faq-banner-image.png"
+                            alt="FAQ for host"
+                        />
+                         
+                        <Card.Body>
+                            <p className="card-text">
+                                {' '}
+                                <h3>Prepare for your Workshop!</h3>
+                                Read some of our Frequently Asked Questions from hosts just like you!
+                            </p>
+                        </Card.Body>
+                        </Link>
+                   
+                </Card>
+            </Row>
+        </React.Fragment>
+    );
+};
+
+HostDash.propTypes = {
+    profileData: PropTypes.shape({
+        userId: PropTypes.number.isRequired,
+        hostId: PropTypes.number.isRequired,
+        firstName: PropTypes.string.isRequired,
+        middleI: PropTypes.string.isRequired,
+        lastName: PropTypes.string.isRequired,
+        avatarUrl: PropTypes.string.isRequired,
+        dateCreated: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+    }),
+};
+
+export default HostDash;
