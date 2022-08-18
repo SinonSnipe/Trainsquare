@@ -1,0 +1,180 @@
+import React, { useEffect, useState } from 'react';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Row, Col, Card, Container } from 'react-bootstrap';
+import './css/product.css';
+import debug from 'sabio-debug';
+const _logger = debug.extend('checkout');
+
+const CheckoutForm = () => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [workshop] = useState({
+        name: 'Viking War Hall',
+        class: 'Critical Thinking Workshop',
+        date: '10/25/2022',
+        time: '3:00pm',
+        duration: '90 minutes',
+        groupSize: 1,
+        cost: '$120.00',
+        url:'https://tinyurl.com/2zpynb2b'
+    });
+
+    const [lesson] = useState({
+        title: 'Essentials of Crochet',
+        description:
+            'Whether you are a beginner looking to learn crochet for the first time or more experienced and looking to expand your skills, this Private class has got you covered.',
+    });
+
+    _logger(workshop)
+
+    const [email, setEmail] = useState('');
+
+    const [message, setMessage] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!stripe) {
+            return;
+        }
+
+        const clientSecret = new URLSearchParams(window.location.search).get('payment_intent_client_secret');
+
+        if (!clientSecret) {
+            return;
+        }
+
+        stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+            switch (paymentIntent.status) {
+                case 'succeeded':
+                    setMessage('Payment succeeded!');
+                    break;
+                case 'processing':
+                    setMessage('Your payment is processing.');
+                    break;
+                case 'requires_payment_method':
+                    setMessage('Your payment was not successful, please try again.');
+                    break;
+                default:
+                    setMessage('Your payment could not be verified');
+                    break;
+            }
+        });
+    }, [stripe]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!stripe || !elements) {
+            return;
+        }
+
+        setIsLoading(true);
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                // eslint-disable-next-line camelcase
+                return_url: 'https://localhost:3000/checkout/payment/success',
+                // eslint-disable-next-line camelcase
+                receipt_email: email,
+            },
+        });
+
+        if (error.type === 'card_error' || error.type === 'validation_error') {
+            setMessage(error.message);
+        } else {
+            setMessage('An unexpected error occured.');
+        }
+
+        setIsLoading(false);
+    };
+
+    return (
+        <>
+            <Container className="d-flex justify-content-center">
+                <Row>
+                    <Col className="">
+                        <Row className="text-center">
+                            <Col>
+                                <h1>CHECKOUT</h1>
+                            </Col>
+                        </Row>
+
+                        <Card className="payment-card" align="center">
+                            <Card.Header as="h2" className="checkout-background text-center">
+                                WORKSHOP DETAILS
+                            </Card.Header>
+
+                            <Card.Body>
+                                <Row>
+                                    <Col>
+                                        <img
+                                            src={workshop.url}
+                                            className="checkout-img card-img-top"
+                                            alt="venue"></img>
+                                    </Col>
+                                    <Col>
+                                        <h3 className="text-center">{lesson.title}</h3>
+                                        <p className="workshop-font text-">{lesson.description}</p>
+                                    </Col>
+                                </Row>
+                                <Row className="text-center workshop-font workshop-address">
+                                    <Col>Date: {workshop.date}</Col>
+                                    <Col>Time: {workshop.time}</Col>
+                                    <Col>Duration: {workshop.duration}</Col>
+                                </Row>
+                            </Card.Body>
+                        </Card>
+                        <Card className="payment-card">
+                            <Card.Header as="h2" className="checkout-background text-center">
+                                PAYMENT INFORMATION
+                            </Card.Header>
+                            <Card.Body>
+                                <h3>Amount Details</h3>
+
+                                <p className="workshop-font">Subtotal: {workshop.cost}</p>
+                                <p className="workshop-font">Taxes: Included</p>
+                                <hr></hr>
+                                <h4>Total: {workshop.cost}</h4>
+
+                                <div className="form-group">
+                                    <label htmlFor="email">Email address</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        id="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Enter Email for payment receipt"
+                                    />
+                                </div>
+                                <h5>Please Enter Card Information Below</h5>
+
+                                <div className="text-center">
+                                    <div id="payment-form" onSubmit={handleSubmit}>
+                                        <PaymentElement id="payment-element" />
+                                        <button
+                                            disabled={isLoading || !stripe || !elements}
+                                            id="submit"
+                                            onClick={handleSubmit}>
+                                            <span id="button-text">
+                                                {isLoading ? (
+                                                    <div className="spinner" id="spinner"></div>
+                                                ) : (
+                                                    'Submit payment'
+                                                )}
+                                            </span>
+                                        </button>
+                                        {message && <div id="payment-message">{message}</div>}
+                                    </div>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </>
+    );
+};
+
+export default CheckoutForm;
