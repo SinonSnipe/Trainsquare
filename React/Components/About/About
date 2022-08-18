@@ -1,0 +1,52 @@
+import React from 'react';
+import {Container, Row, Col } from 'react-bootstrap';
+import "./about.css"
+import { Card } from 'react-bootstrap'; 
+const  Aboutus= ()=>{
+     return(
+        <>
+            <section className="py-5 bg-light-lighten border-top border-bottom border-light">
+                <Container>
+                    <Row>
+                        <Col>
+                        {/* <div className="container bg-dark"> */}
+                    <Card className="mx-5 ">
+                        <Card.Header className="header">
+                            <div className="col">
+                                <h2 className="header-font text-center">About Us</h2>
+                            </div>
+                        </Card.Header>
+                        <Card.Body>
+                            <div className="card-body-about-us" style={{ backgroundColor: 'white' }}>
+                                <blockquote className="blockquote mb-0 contact-txt-color">
+                                    <p>
+                                    The concept of Trainsquare was born before the COVID-19 pandemic, but the unfolding of the pandemic further solidified the need for in-person interactions in the local community.
+
+                                    Founder and CEO, Nadeen Awwad, and the co-founders created Trainsquare because they see a need for tech-enabled solutions to promote in-person interactions and build community.
+
+                                    While online communities give us the illusion of connection, research repeatedly reminds us that in-person social interactions are critical for our well-being.
+                                    
+                                    The Trainsquare team believes they can contribute to bringing the community together through in-person, hands-on, interactive group workshops. Trainsquare is launching in Abu Dhabi soon with an ambitious plan to expand globally.
+                                    </p>
+                                    <br></br>
+                                    <footer className="blockquote-footer contact-txt-color">Trainsquare</footer>
+                                </blockquote>
+                            </div>
+                     </Card.Body>
+                    </Card>              
+                  </Col>
+                    </Row>
+
+                   
+                </Container>
+            </section>
+        </>
+    );
+};
+
+
+                    
+export default Aboutus;
+
+
+
