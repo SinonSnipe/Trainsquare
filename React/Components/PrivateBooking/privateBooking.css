@@ -1,0 +1,19 @@
+label {
+    margin-right: 20px;
+    width: 300px;
+    margin-bottom: 5px;
+}
+
+input {
+    margin-right: 20px;
+    width: 300px;
+    margin-bottom: 5px;
+}
+
+.private-workshop-button {
+    margin-left: 120px;
+}
+
+.shadow {
+    box-shadow: 0 20px;
+}
