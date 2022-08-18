@@ -1,0 +1,154 @@
+import React, { useEffect, useState } from 'react';
+import * as externalLinksService from '../../services/externalLinksService.js';
+import toastr from 'toastr';
+import debug from 'sabio-debug';
+import PageTitle from './PageTitle';
+import { Link } from 'react-router-dom';
+import { Row, Col, Card, Table } from 'react-bootstrap';
+
+const _logger = debug.extend('ExternalLinks');
+
+_logger('ExternalLinks');
+
+function ExternalLinks() {
+    const [externalLinksList, setExternalLinksList] = useState([]);
+    const [pageInfo] = useState({ pageIndex: 0, pageSize: 100 });
+
+    useEffect(() => {
+        externalLinksService
+            .PaginateSelectAll(pageInfo.pageIndex, pageInfo.pageSize)
+            .then(onPaginateSelectAllSuccess)
+            .catch(onPaginateSelectAllError);
+    }, []);
+
+    const onPaginateSelectAllSuccess = (response) => {
+        _logger(response, 'just ran: onPaginateSelectAllSuccess');
+        const receivedArray = response.data.item.pagedItems;
+        toastr.success(`Success getting paginated ExternalLinks list`);
+        setExternalLinksList((prevState) => {
+            let newExternalLinksList = {
+                ...prevState,
+            };
+            newExternalLinksList = receivedArray;
+            return newExternalLinksList;
+        });
+    };
+    const onPaginateSelectAllError = (error) => {
+        _logger(error, 'just had: onPaginateSelectAllError');
+        const errorData = error.data;
+        toastr.error(`Retrieval Request Error: ${errorData}`);
+    };
+
+    const onDeleteClick = (e) => {
+        e.preventDefault();
+        externalLinksService
+            .DeleteExternalLink(e.target.id)
+            .then(onDeleteExternalLinkSuccess)
+            .catch(onDeleteExternalLinkError);
+    };
+    const onDeleteExternalLinkSuccess = () => {
+        toastr.success('Delete-Request Success');
+    };
+    const onDeleteExternalLinkError = () => {
+        toastr.error('Delete-Request Error');
+    };
+
+    return (
+        <React.Fragment>
+            <PageTitle
+                breadCrumbItems={[
+                    { label: 'External Links', path: '/externallinks/externallinksmain' },
+                    { label: 'Get All', path: '/externallinks', active: true },
+                ]}
+                title={'External Links'}
+            />
+            <div className="bg-dark">
+                <br></br>
+                <div className="container">
+                    <h4>Retrieve All Records</h4>
+                </div>
+                <div className="mx-auto" style={{ width: 400 }}>
+                    <form>
+                        <button type="submit" href="#" className="btn btn-primary" id="returnToExternalLinksMain">
+                            <Link to="/externallinks/externallinksmain" className="text-light">
+                                Return to Main
+                            </Link>
+                        </button>
+                    </form>
+                </div>
+                <br></br>
+                <br></br>
+                <div className="col-md-9 mx-auto">
+                    <Row>
+                        <Col>
+                            <Card
+                                style={{
+                                    height: '75vh',
+                                    overflow: 'scroll',
+                                    whitepace: 'nowrap',
+                                }}>
+                                <Card.Body>
+                                    <h4 className="header-title">
+                                        All Records -{' '}
+                                        <span className="text-muted font-11">SCROLL to bottom for more records</span>
+                                    </h4>
+                                    <br></br>
+
+                                    <Table className="mb-0" bordered>
+                                        <thead>
+                                            <tr>
+                                                <th>Record</th>
+                                                <th>User ID</th>
+                                                <th>Entity</th>
+                                                <th>Business#</th>
+                                                <th>Link Type</th>
+                                                <th>Link</th>
+                                                <th className="text-center">Delete</th>
+                                                <th className="text-center">Update</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {externalLinksList.map((externalLinksList, index) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <th scope="row">{externalLinksList.id}</th>
+                                                        <td>{externalLinksList.userBasic.id}</td>
+                                                        <td>{externalLinksList.entityBusinessType}</td>
+                                                        <td>{externalLinksList.entityId}</td>
+                                                        <td>{externalLinksList.urlType}</td>
+                                                        <td>{externalLinksList.url}</td>
+                                                        <td className="table-action text-center">
+                                                            <button
+                                                                className="btn bg-white btn-sm m-1 text-muted"
+                                                                id={externalLinksList.id}
+                                                                onClick={onDeleteClick}>
+                                                                Delete
+                                                            </button>
+                                                        </td>
+                                                        <td className="table-action text-center">
+                                                            <Link
+                                                                to="/externallinks/externallinksmain"
+                                                                className="btn bg-white btn-sm m-1 text-muted"
+                                                                id={externalLinksList.id}>
+                                                                Update
+                                                            </Link>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </Table>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+                <br></br>
+                <br></br>
+                <br></br>
+            </div>
+        </React.Fragment>
+    );
+}
+
+export default ExternalLinks;
