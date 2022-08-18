@@ -1,0 +1,413 @@
+import React, {useState, useEffect, useCallback} from 'react';
+import { Modal, CardGroup, Card, Button } from 'react-bootstrap';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Service from '../../services/locationService';
+import LocationCard from './LocationCard';
+import locationValid from '../../schema/locationValidationSchema';
+import PropTypes from 'prop-types';
+import toastr from 'toastr';
+import './autocomplete.css';
+import {LoadScript, Autocomplete} from '@react-google-maps/api';
+import lookup from '../../services/lookupService';
+
+
+import logger from 'sabio-debug';
+const _log = logger.extend('Locations');
+
+const googleApiKey= process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+
+
+
+
+
+const Locations = (props) =>{
+
+  //Get current user information
+  const currentUser = props.currentUser;
+  // _log('Locations currentUser', currentUser);
+
+     //Set state of modal form 
+     const [locationFormData, setLocationFormData] = useState({
+      id: 0,
+      locationType: '',
+      lineOne: '',
+      lineTwo: '',
+      city: '',
+      zip: '',
+      state: '',
+      latitude: Number,
+      longitude: Number,
+});
+
+        // Autocomplete instantiation
+  const [autocomplete, setAutocomplete] = useState(); 
+
+  const onLoad = (autocomplete) => {
+    _log('autocomplete: ', autocomplete)
+    setAutocomplete(() => autocomplete)
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      autoUpdate(place);
+    } 
+    else {
+      _log('Autocomplete is not loaded yet!')
+      }
+  };
+
+  const autoUpdate = useCallback((place) => {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const add = place.address_components;
+    _log('Autocomplete info Place', place);
+    setLocationFormData((prevState) => {
+      return {...prevState,
+        lineOne: place.name,
+        city: add[2].long_name,
+        state: add[4].short_name,
+        latitude: lat,
+        longitude: lng,
+      }
+    });
+  },[]);
+
+
+
+  //Set Location List to local environment
+  const [locations, setLocations] = useState({locationsList:[],locationsMapped:[]});
+  const [locType, setLocType] = useState({});
+
+
+
+  //Get initial page of location data 
+  useEffect(()=>{
+    getLocations(currentUser.id)
+
+    lookup(['LocationTypes']).then(onLookupSuccess);
+  },[]);
+
+
+
+  const onLookupSuccess = (response) => {
+    _log('Lookup Location Types', response)
+    const mappedLocationTypes = response.item.locationTypes?.map(mapLocationType);
+    setLocType(mappedLocationTypes);
+  };
+
+  const mapLocationType = (item,index) => (
+    <option value={item.name} key={`${item}_${index}`}>
+        {item.name}{''}
+    </option>
+  );
+
+
+        //Get all locations by user Id and render to the DOM
+  const getLocations = (creatorId) => {
+    Service.getAllLocationsByCreator(creatorId).then(onGetAllLocationsSuccess).catch(onGetAllLocationsError)
+  };
+  const onGetAllLocationsSuccess = (response) => {
+    const ll= response.data.item.pagedItems;
+    // _log('GetAllLocationSuccess LocationList', ll);
+    setLocations((prevState)=>{
+      return{...prevState,locationsList:ll,locationsMapped:ll.map(mapLocation)}
+    })
+  };
+  const onGetAllLocationsError = (response) => {
+    _log('GetAllLocationsError', response)
+  };
+
+
+          //Modal submission: redirection to add or update 
+  const onClickSubmit = (values) => {
+    _log('onClickSubmit', values);
+    // _log('onClickSubmit values', values);
+      if (locationFormData.id === 0) {
+        Service.addLocation(values)
+        .then(onAddLocationSuccess)
+        .catch(onAddLocationError)
+      }
+      else {
+        _log('Update pending', values);
+        Service.updateLocationRequest(values)
+        .then(onUpdateLocationSuccess)
+        .catch(onUpdateLocationError);
+      };
+  };
+
+
+            //Add location success
+  const onAddLocationSuccess = (response) => {
+    _log('onAddLocationSuccess', response);
+    toastr.success('Your location has been successfully added.');
+    getLocations(currentUser.id);
+    clearForm()
+    handleClose()
+  };
+  const onAddLocationError = (response) => {
+    _log('onAddLocationError', response)
+    toastr.error('Please check that your location meets our criteria.')
+  };
+
+        //Update Location handler 
+  const onClickUpdateLocation = (location) => {
+    handleShow()
+
+    setLocationFormData(() => {
+      let formData = {
+        id: location.id,
+        locationType: location.locationType,
+        lineOne: location.lineOne,
+        lineTwo: location.lineTwo,
+        city: location.city,
+        zip: location.zip,
+        state: location.state,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }
+      return formData
+    });
+  };
+            //Update location success
+  const onUpdateLocationSuccess = (response) => {
+    _log('onUpdateLocationSuccess response', response);
+    toastr.success('Your location has been successfully updated.');
+    getLocations(currentUser.id);
+    getLocations(currentUser.id);
+    clearForm()
+    handleClose()
+  };
+  const onUpdateLocationError = (response) => {
+    _log('onUpdateLocationError', response);
+    toastr.error('Please ensure that your location updates meet our criteria.')
+  };
+
+
+          //Delete location
+  const onClickDeleteLocation = (location) => {
+    Service.deleteLocationRequest(location.id)
+    .then(onDeleteLocationSuccess(location.id))
+    .catch(onDeleteLocationError);
+  };
+
+  const onDeleteLocationSuccess = (idToDelete) => {
+    setLocations((prevState) => {
+      const temp = {...prevState};
+        temp.locationsList = [...prevState.locationsList];
+
+      const indOf = temp.locationsList.findIndex((location) => {
+        if (location.id === idToDelete) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+    if (indOf >= 0) {
+        temp.locationsList.splice(indOf, 1);
+        temp.locationsMapped = temp.locationsList.map(mapLocation);
+    }
+      return temp;
+    });
+    toastr.success('Location deleted.')
+  };
+
+  const onDeleteLocationError = (response) => {
+    _log('onDeleteLocationError', response)
+    toastr.error('Unable to delete location.')
+  };
+
+
+
+
+
+        //Modal, Cards, Forms, & React 
+const mapLocation = (location) => {
+  return (
+  <LocationCard
+  location={location}
+  key={"ListA-"+ location.id}
+  onClickDeleteLocation = {onClickDeleteLocation}
+  onClickUpdateLocation = {onClickUpdateLocation}
+  />
+  )};
+
+
+  //Modal functions to show/hide 
+  const [show, setShow] = useState(false);
+  const handleClose = () => {
+    setShow(false);
+    clearForm()
+    }
+  const handleShow = () => setShow(true);
+
+
+  const clearForm = () => {
+    setLocationFormData(() => {
+      return{
+        id: 0,
+        locationType: '',
+        lineOne: '',
+        lineTwo: '',
+        city: '',
+        zip: '',
+        state: '',
+        latitude: Number,
+        longitude: Number,
+      }
+    })
+  };
+
+
+
+    return (
+      <React.Fragment>
+         <LoadScript
+            googleMapsApiKey={googleApiKey}
+            libraries={["places"]}
+        >
+        </LoadScript>
+        <Modal 
+        show={show} 
+        onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title >Add or Change Location</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Formik
+                            enableReinitialize={true}
+                            initialValues={locationFormData}
+                            onSubmit={onClickSubmit}
+                            validationSchema={locationValid}>
+                            <Form>
+                              <div className="form-group my-3">
+                                    <label>Address Line 1</label>
+                                    <Autocomplete 
+                                      onLoad={onLoad}
+                                      onPlaceChanged={onPlaceChanged}
+                                    >
+                                      <Field 
+                                        name="lineOne"
+                                        type="text"
+                                        placeholder="Address..."
+                                        className="form-control"
+                                      />
+                                    </Autocomplete>
+                                    <ErrorMessage name="lineOne" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>Location Type:</label>
+                                    <Field as="select" name="locationType" className='btn btn-small'>
+                                      {locType}
+                                  </Field>
+                                    <ErrorMessage name="locationType" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>Address Line 2</label>
+                                    <Field
+                                        name="lineTwo"
+                                        type="text"
+                                        placeholder="Additional Address Info"
+                                        className="form-control"
+                                    />
+                                    <ErrorMessage name="lineTwo" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>City</label>
+                                    <Field
+                                        name="city"
+                                        type="text"
+                                        placeholder="City"
+                                        className="form-control"
+                                    />
+                                    <ErrorMessage name="city" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>Zipcode</label>
+                                    <Field
+                                        name="zip"
+                                        type="text"
+                                        placeholder="Zipcode"
+                                        className="form-control"
+                                    />
+                                    <ErrorMessage name="zip" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                   <label>State</label>
+                                    <Field
+                                        name="state"
+                                        type="text"
+                                        placeholder=" State "
+                                        className="form-control"
+                                    />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>Latitude</label>
+                                    <Field
+                                        name="latitude"
+                                        type="number"
+                                        step="0.0000001"
+                                        min='-90'
+                                        max='90'
+                                        placeholder="Latitude to 4 decimal places"
+                                        className="form-control"
+                                    />
+                                    <ErrorMessage name="latitude" component="div" className="has-error" />
+                                </div>
+                                <div className="form-group my-3">
+                                    <label>Longitude</label>
+                                    <Field
+                                        name="longitude"
+                                        type="number"
+                                        step="0.0000001"
+                                        min='-180'
+                                        max='180'
+                                        placeholder="Longitude to 4 decimal places"
+                                        className="form-control"
+                                    />
+                                    <ErrorMessage name="longitude" component="div" className="has-error" />
+                                </div>
+                                <div className='align-end'>
+                                <Button type="submit" className="btn btn-primary">
+                                    Save
+                                </Button>
+                                </div>
+                            </Form>
+                        </Formik>
+          </Modal.Body>
+          <Modal.Footer>
+          </Modal.Footer>
+        </Modal>
+
+    <div className='container-fluid'>
+      <h2 className='text-center'>Locations</h2>
+      <CardGroup className='container flex align-items-center'>
+        <div className='row justify-content-center'>
+        <Card  style={{border: "dashed", borderRadius: '1rem', width: '18rem', margin: '1rem'}} onClick={handleShow}>
+            <Card.Body className='d-flex align-items-center text-center justify-content-center'>
+                <div>
+                <h2>Add Location</h2>
+                <h1>+</h1>
+                </div>
+            </Card.Body>
+            </Card>
+            {locations.locationsMapped}
+          </div>
+      </CardGroup>
+    </div>
+  </React.Fragment>
+  )
+};
+
+export default Locations;
+
+
+Locations.propTypes = {
+  currentUser: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    email: PropTypes.string.isRequired,
+    isLoggedIn: PropTypes.bool.isRequired,
+    roles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }),
+}; 
