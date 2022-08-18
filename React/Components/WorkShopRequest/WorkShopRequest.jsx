@@ -1,0 +1,197 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { Pagination } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import * as service from '../../services/workshoprequestService';
+import WorkShopRequestCards from './WorkShopRequestCards';
+import toastr from '../../utils/toastr.js';
+import debug from 'sabio-debug';
+import './css/new.css';
+
+const _logger = debug.extend('WorkShopRequest');
+
+const RequestForms = (props) => {
+    const currentRequest = props.currentRequest;
+    _logger('currentRequest', currentRequest);
+    const [requestFormData, setRequestFormData] = useState({
+        arrayOfOldRequest: [],
+        requestComponents: [],
+        isShown: false,
+        isCurrent: false,
+        current: 1,
+        index: 0,
+        size: 2,
+        items: [],
+        searchInput: '',
+    });
+    const [header, setHeader] = useState({
+        header: '',
+    });
+
+    /*____________________AXIOS CALL FOR GETTING MY FORMS________________________________ */
+
+    useEffect(() => {
+        if (!requestFormData.isCurrent) {
+            setHeader((prevState) => {
+                return { ...prevState, header: 'All Request' };
+            });
+            if (requestFormData.searchInput) {
+                getBySearch(requestFormData.searchInput);
+            } else {
+                get(requestFormData);
+            }
+        }
+    }, [requestFormData.isCurrent, requestFormData.current, requestFormData.searchInput]);
+
+    /*____________________MAPPER________________________________ */
+
+    const mapRequest = (aRequest) => {
+        _logger('mapping', aRequest);
+        return (
+            <WorkShopRequestCards
+                request={aRequest}
+                isCurrent={requestFormData.isCurrent}
+                onDeleteClicked={onRemoveRequested}
+                key={'ListA-' + aRequest.instructorId}
+            />
+        );
+    };
+
+    /*____________________AXIOS CALL FOR DELETING MY FORM________________________________ */
+
+    const onRemoveRequested = useCallback((currentRequest, eObj) => {
+        _logger(currentRequest.id, eObj);
+        const handler = getSuccessHandler(currentRequest);
+        service.remove(currentRequest).then(handler).catch(onRemoveError);
+    }, []);
+
+    const getSuccessHandler = (idToBeDeleted) => {
+        return () => {
+            setRequestFormData((prevState) => {
+                const pd = { ...prevState };
+                pd.isCurrent = true;
+                const lessons = pd.arrayOfOldRequest;
+                const idxOf = lessons.findIndex((aRequest) => aRequest.id === idToBeDeleted);
+
+                if (idxOf >= 0) {
+                    lessons.splice(idxOf, 1);
+                    pd.requestComponents = lessons.map(mapRequest);
+                }
+                return pd;
+            });
+            toastr.success(`${idToBeDeleted.title} has been deleted.`);
+        };
+    };
+    const onRemoveError = (err) => {
+        toastr.error(err);
+    };
+
+    const get = (currentPage) => {
+        service.get(currentPage.index, currentPage.size).then(onGetSuccess).catch(onGetError);
+    };
+
+    const getBySearch = (searchString) => {
+        service
+            .getBySearch(requestFormData.index, requestFormData.size, searchString)
+            .then(onGetSuccess)
+            .catch(onGetError);
+    };
+
+    const onGetError = (err) => {
+        toastr.error(err);
+    };
+    const onGetSuccess = (response) => {
+        let pd = response.item;
+        let lessons = pd.pagedItems;
+
+        setRequestFormData((prevState) => {
+            let newCurrent = [];
+            for (let number = 1; number <= pd.totalPages; number++) {
+                newCurrent.push(
+                    <Pagination.Item active={number === requestFormData.current} onClick={onPageClick} key={number}>
+                        {number}
+                    </Pagination.Item>
+                );
+            }
+            return { ...prevState, lessons: lessons, requestComponents: lessons.map(mapRequest), items: newCurrent };
+        });
+    };
+    const onInputChange = (e) => {
+        const target = e.target;
+        const searchInput = target.value;
+        setRequestFormData((prevState) => ({ ...prevState, searchInput }));
+    };
+
+    const onPageClick = (e) => {
+        let newCurrent = parseInt(e.target.text);
+        setRequestFormData((prevState) => {
+            return { ...prevState, index: newCurrent - 1, current: newCurrent };
+        });
+    };
+    const onPrevClick = () => {
+        setRequestFormData((prevState) => {
+            let pd = { ...prevState };
+            pd.current = prevState.current - 1;
+            pd.index = prevState.index - 1;
+            return pd;
+        });
+    };
+    const onNextClick = () => {
+        setRequestFormData((prevState) => {
+            let pd = { ...prevState };
+            pd.current = prevState.current + 1;
+            pd.index = prevState.index + 1;
+            return pd;
+        });
+    };
+
+    return (
+        <React.Fragment>
+            <link
+                rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"></link>
+            <div className="container-fluid lessons-container">
+                <h4 className="lessons-header">{header.header}</h4>
+
+                {!requestFormData.isCurrent && (
+                    <div className="search-container">
+                        <div className="input-group">
+                            <div className="form-outline search-outline">
+                                <input
+                                    placeholder="Search..."
+                                    type="search"
+                                    id="form1"
+                                    className="form-control search-bar"
+                                    onChange={onInputChange}
+                                    value={requestFormData.searchInput}
+                                />
+                            </div>
+                            <i className="bi bi-search"></i>
+                        </div>
+                    </div>
+                )}
+                <p></p>
+                <Link to={'/workshoprequestform'} className="new-lesson">
+                    <i className="bi bi-plus"></i>
+                    New Request
+                </Link>
+
+                <div className="row page-data">
+                    {requestFormData.requestComponents}
+
+                    <Pagination>
+                        <Pagination.Prev onClick={onPrevClick} />
+                        {requestFormData.items}
+                        <Pagination.Next onClick={onNextClick} />
+                    </Pagination>
+                </div>
+            </div>
+        </React.Fragment>
+    );
+};
+RequestForms.propTypes = {
+    currentRequest: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+    }),
+};
+export default RequestForms;
