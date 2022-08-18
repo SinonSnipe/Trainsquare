@@ -1,0 +1,116 @@
+import React, { useState, useEffect } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import faqFormSchema from '../../schema/faqFormSchema';
+import logger from 'sabio-debug';
+import lookup from '../../services/lookupService';
+import Footer from '../../layouts/Footer';
+import PageTitle from './PageTitle';
+import toastr from '../../utils/toastr';
+import * as emailService from '../../services/emailService';
+
+const _logger = logger.extend('FaqForm');
+
+function FaqForm() {
+    const [formData] = useState({ name: '', email: '', question: '' });
+    const [mappedCategories, setCategory] = useState([]);
+
+    useEffect(() => {
+        lookup(['FaqCategories']).then(onLookupSuccess).catch(onLookupError);
+    }, []);
+
+    const onLookupSuccess = (response) => {
+        _logger(response.item.faqCategories);
+        let mappedCategories = response.item.faqCategories?.map(mapCategory);
+        setCategory(mappedCategories);
+    };
+    const onLookupError = (error) => {
+        _logger(error);
+    };
+
+    const mapCategory = (category, index) => (
+        <option value={category.name} key={`${category}_${index}`}>
+            {' '}
+            {category.name}
+        </option>
+    );
+
+    const handleSubmit = (values) => {
+        const formValues = {
+            name: values.name,
+            email: values.email,
+            category: values.category,
+            question: values.question,
+        };
+        // _logger('Faq payload', formValues);
+        emailService.submitfaq(formValues).then(onSendSuccess).catch(onSendError);
+    };
+
+    const onSendSuccess = (response) => {
+        _logger('Faq sent.', response);
+        toastr.success('Thank you. You will receive an answer to your question shortly.');
+    };
+    const onSendError = (error) => {
+        _logger('Error: Faq not sent.', error);
+        toastr.error('Your question was not submitted. Please try again later.');
+    };
+
+    return (
+        <div>
+            <PageTitle
+                breadCrumbItems={[
+                    { label: 'FAQs', path: '/faqs' },
+                    { label: 'Submit A Question', path: '/faqs/submit', active: true },
+                ]}
+            />
+
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-6 mx-auto">
+                        <h1 className="text-center">Submit a question</h1>
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={formData}
+                            onSubmit={handleSubmit}
+                            validationSchema={faqFormSchema}>
+                            <Form>
+                                <div className="card p-3">
+                                    <div className="form-group">
+                                        <label htmlFor="name">Name</label>
+                                        <Field type="text" name="name" className="form-control" />
+                                        <ErrorMessage name="name" component="div" className="mx-3" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="answer">Email</label>
+                                        <Field type="email" name="email" className="form-control" />
+                                        <ErrorMessage name="email" component="div" className="mx-3" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="category">Please select a category </label>
+                                        <Field component="select" name="categoryId" className="form-control">
+                                            <option value="">Select</option>
+                                            {mappedCategories}
+                                        </Field>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="question">Question</label>
+                                        <Field component="textarea" name="question" className="form-control" />
+                                        <ErrorMessage name="question" component="div" className="mx-3" />
+                                    </div>
+                                    <div className="d-grid gap-2 d-md-block">
+                                        <button type="submit" className="btn btn-primary btn-sm mt-2">
+                                            <i className="mdi mdi-email-outline me-1"></i> Submit question
+                                        </button>
+                                    </div>
+                                </div>
+                            </Form>
+                        </Formik>
+                    </div>
+                </div>
+            </div>
+            <div className="container-fluid">
+                <Footer />
+            </div>
+        </div>
+    );
+}
+export default FaqForm;
