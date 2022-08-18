@@ -1,0 +1,76 @@
+.checkout-img {  
+  align-self:center;
+  width: 300px;
+  height:200px;
+  border-radius: 10%;
+}
+
+.checkout-background{
+  background-color: #727cf5;
+  color:white;
+}
+.payment-card{
+  width:800px;
+  align-self: center;
+}
+   
+.stripe-button{
+  padding-top:10px;
+}
+
+.success-button{
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
+  border-radius: 4px;
+  color: #ffffff;
+  background: #727cf5;
+  font-family: Arial, sans-serif;
+  transition: all 0.2s ease;
+  padding: 12px 16px;
+  border:none;
+}
+.payment-success-center{
+  min-height: 50%;
+  min-height: 100vh;
+  
+  display: flex;
+  align-items: center;
+}
+
+.success-header{
+  background-color: #727cf5;
+  color: white;
+}
+
+.workshop-address{  
+  align-items: center; 
+}
+
+.success-card {
+  padding-top:20px;
+  width: 65rem;
+ }  
+
+.workshop-font{
+  font-size:20px;
+}
+.stripe-card{
+  align-items:center;
+}
+
+.card-padding{
+  padding-left: 25px;
+  padding-top: 25px;
+}
+
+.payment-background{  
+    background: url('../../../assets/images/bg-pattern-light.svg') center;
+    background-size: cover;
+}
+
+
+
+
+
+
