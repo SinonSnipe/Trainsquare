@@ -1,0 +1,34 @@
+.faqBanner {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+}
+
+.workshopTable {
+    height: 450px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.textDisplay {
+    text-align: right;
+}
+
+.titleClass{
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.numberClass{
+    font-size: 25px;
+}
+
+.iconControl{
+    position: absolute;
+}
+
+.paymentTable{
+    height: 395px;
+    width: 100%;
+ 
+}
