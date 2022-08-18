@@ -1,0 +1,68 @@
+.notes-card {
+    width: 300px;
+    height: 350px;
+    margin-bottom: 50px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 1px 10px 1px black;
+    overflow: hidden;
+    position: relative;
+}
+
+.notes-upper-container {
+    height: 50px;
+    background: linear-gradient(to left, #727cf5, #39afd1);
+}
+
+.notes-lower-container {
+    margin-top: 60px;
+    height: 150px;
+    background: white;
+    text-align: center;
+}
+
+.notes-lower-container h3,
+h4,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.notes-lower-container h3 {
+    color: #2f2d2e;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.notes-lower-container h4 {
+    color: #5363d8;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.notes-lower-container p {
+    margin: 1rem;
+    font-weight: 300;
+    color: #2f2d2e;
+    font-size: 0.9rem;
+    text-align: justify;
+}
+
+.notes-btn-notes {
+    margin: 1rem;
+    margin-top: 0;
+    color: 2f2d2e;
+    font: bold;
+    background-color: white;
+    border: 2px solid #5363d8;
+    border-radius: 10px;
+    transition-duration: 0.5s;
+    animation: ease-in-out;
+}
+
+button:hover {
+    background-image: linear-gradient(to left, #727cf5, #39afd1);
+    transform: scale(1.1);
+    border: none;
+    color: white;
+}

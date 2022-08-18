@@ -1,0 +1,166 @@
+import React, { useState, useEffect } from 'react';
+import { Modal, Form } from 'react-bootstrap';
+import debug from 'sabio-debug';
+import toastr from '../../utils/toastr';
+import lookup from '../../services/lookupService';
+import sessionNoteService from '../../services/sessionNoteService';
+const _logger = debug.extend('AddNoteButton');
+
+function AddNoteButton() {
+    const [scroll, setScroll] = useState(null);
+    const [size, setSize] = useState(null);
+    const [className, setClassName] = useState(null);
+    const [modal, setModal] = useState(false);
+
+    const [noteValues, setNoteValues] = useState({
+        workshopName: '',
+        tagsTypeId: '',
+        notes: '',
+        sessionDate: '',
+    });
+
+    const onNoteFormChange = (e) => {
+        const target = e.target;
+        const newNoteValue = target.value;
+        const nameOfNoteField = target.name;
+        setNoteValues((prevState) => {
+            const newNoteObject = { ...prevState };
+            newNoteObject[nameOfNoteField] = newNoteValue;
+            return newNoteObject;
+        });
+    };
+
+    const [tagsContent, setTagsContent] = useState([]);
+    useEffect(() => {
+        lookup(['TagsTypes']).then(onLookupSuccess).catch(onLookupError);
+    }, []);
+    const onLookupSuccess = (response) => {
+        setTagsContent((prevState) => {
+            let newType = { ...prevState };
+            newType = response.item.tagsTypes;
+            newType.arrayOfComponents = response.item.tagsTypes.map(mapOptions);
+            return newType;
+        });
+    };
+
+    const onLookupError = (response) => {
+        _logger(response, 'error retrieving lookup table');
+    };
+
+    const mapOptions = (tagsTypeId, index) => (
+        <option value={tagsTypeId.id} key={`${tagsTypeId}_${index}`}>
+            {tagsTypeId.name}
+        </option>
+    );
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        _logger('noteValues', noteValues);
+        sessionNoteService.add(noteValues).then(onUpdateSuccess).catch(onUpdateError);
+    };
+
+    const onUpdateSuccess = (response) => {
+        toastr.success('Note Added');
+        window.location.reload();
+        _logger(response.item, 'update response');
+    };
+
+    const onUpdateError = (error) => {
+        toastr.error('Unable to Add Note');
+        _logger(error);
+    };
+
+    const openModalWithScroll = () => {
+        setScroll(true);
+        setSize(null);
+        setClassName(null);
+        toggle();
+        setModal(!modal);
+    };
+
+    const toggle = () => {
+        setModal(!modal);
+    };
+
+    return (
+        <React.Fragment>
+            <button
+                className="btn btn-primary mt-1 mx-1  back rounded-pill shadow-lg"
+                onClick={openModalWithScroll}
+                style={{ float: 'right' }}>
+                Add a Note
+            </button>
+            <Modal show={modal} onHide={toggle} dialogClassName={className} size={size} scrollable={scroll}>
+                <Modal.Header onHide={toggle} closeButton>
+                    <h4 className="modal-title"> Add a Note </h4>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <div className="form-group mb-3 my-2 mx-2">
+                            <label htmlFor="workShop">Name Of Workshop</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={noteValues.workshopName}
+                                onChange={onNoteFormChange}
+                                placeholder="Enter Workshop Name"
+                                name="workshopName"
+                            />
+                        </div>
+
+                        <div className="form-group mb-3  my-2 mx-2">
+                            <label htmlFor="tagsTypeId">Session Type </label>
+                            <select
+                                className="form-control"
+                                name="tagsTypeId"
+                                onChange={onNoteFormChange}
+                                value={noteValues.tagsTypeId}>
+                                <option value="">Select Session Type</option>
+                                {tagsContent?.arrayOfComponents}
+                            </select>
+                        </div>
+                        <div className="form-group mb-3  my-2 mx-2">
+                            <div>
+                                <label htmlFor="notes">Notes</label>
+
+                                <textarea
+                                    className="form-control"
+                                    name="notes"
+                                    value={noteValues.notes}
+                                    onChange={onNoteFormChange}
+                                    rows="7"
+                                    placeholder="Enter Session Notes"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group mb-3 my-2 mx-2">
+                            <label htmlFor="dateModified">Date of Session</label>
+                            <input
+                                type="date"
+                                className="form-control"
+                                value={noteValues.sessionDate}
+                                onChange={onNoteFormChange}
+                                name="sessionDate"
+                            />
+                        </div>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="d-grip gap-2 d-md-flex justify-content-md-end"></div>
+                    <button className="btn btn-secondary mb-2 back rounded-pill shadow" onClick={toggle}>
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="btn btn-primary mb-2 back rounded-pill shadow"
+                        onClick={handleSubmit}>
+                        Add
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        </React.Fragment>
+    );
+}
+
+export default AddNoteButton;
