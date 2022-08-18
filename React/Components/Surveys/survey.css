@@ -1,0 +1,16 @@
+.survey-img {  
+    border-top-left-radius: 30px; 
+    border-top-right-radius: 30px;
+    float: none;
+    max-width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+    
+.rounded-corners {
+    border-radius: 30px;
+    height: 35rem;
+    margin-bottom: 0.5rem;    
+    cursor: pointer;
+    transition: transform 2s;
+}

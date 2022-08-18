@@ -1,0 +1,117 @@
+import React, { useState } from 'react';
+import debug from 'sabio-debug';
+import CreateSurveyHeader from './CreateSurveyHeader';
+import QuestionCard from './QuestionCardDrag';
+import { Button, OverlayTrigger, Tooltip, Stack } from 'react-bootstrap';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+
+function CreateDrag() {
+    const _logger = debug.extend('NewSurvey');
+    const [cardTest, setCardTest] = useState([{ id: 1, data: null }]);
+
+    const addQuestionCard = () => {
+        let newId = cardTest.length + 1;
+        _logger({ key: newId });
+
+        setCardTest(() => {
+            const newCard = { id: newId, data: null };
+            let data = [...cardTest];
+            data.push(newCard);
+            return data;
+        });
+    };
+
+    const removeCard = (id) => {
+        if (cardTest.length > 1) {
+            let cards = [...cardTest];
+            let filteredCards = cards.filter((card) => card.id !== id);
+            _logger({ filtereed: filteredCards });
+            setCardTest(filteredCards);
+        }
+    };
+
+    function handleOnDragEnd(result) {
+        if (!result.destination) return;
+
+        const items = Array.from(cardTest);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setCardTest(items);
+    }
+
+    return (
+        <div className="container">
+            <div className="row">
+                <div className="col-11">
+                    <div className="card-header">
+                        <div className="col">
+                            <CreateSurveyHeader />
+                        </div>
+                    </div>
+                    <div className="p-2">
+                        <div className="row">
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
+                                <Droppable droppableId="questions">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                                            {cardTest.map((card, index) => {
+                                                return (
+                                                    <QuestionCard
+                                                        id={card.id}
+                                                        index={index}
+                                                        key={index}
+                                                        handleDelete={removeCard}
+                                                    />
+                                                );
+                                            })}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-1">
+                    <div className="float position-sticky top-50 translate-middle-x translate-middle-y">
+                        <div className="card p-2">
+                            <div className="btn-group-vertical">
+                                <Stack direction="vertical" gap={1}>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-top`}>Add question</Tooltip>}>
+                                        <Button
+                                            key={`addButto`}
+                                            variant="outline-info"
+                                            size="lg"
+                                            onClick={addQuestionCard}>
+                                            <i className="uil-plus"></i>
+                                        </Button>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-top`}>Add image</Tooltip>}>
+                                        <Button variant="outline-info" size="lg">
+                                            <i className="uil-image-plus"></i>
+                                        </Button>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-top`}>Add video</Tooltip>}>
+                                        <Button key={`deleteButton`} variant="outline-info" size="lg">
+                                            <i className="uil-youtube"></i>
+                                        </Button>
+                                    </OverlayTrigger>
+                                </Stack>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default CreateDrag;
