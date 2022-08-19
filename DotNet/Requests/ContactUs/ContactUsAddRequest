@@ -1,0 +1,33 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+
+namespace Sabio.Models.Requests.ContactUs
+{
+    public class ContactUsAddRequest
+    {
+        [Required]
+        [StringLength(50, ErrorMessage = "Please provide your first name.")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(50, ErrorMessage = "Please provide your last name.")]
+        public string LastName { get; set; }
+
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(50, ErrorMessage = "Please provide the reason for contacting us.")]
+        public string Subject { get; set; }
+
+        [Required]
+        [StringLength(2500, ErrorMessage = "Please provide a message, up to 2500 characters long.")]
+
+        public string Message { get; set; }
+    }
+}
