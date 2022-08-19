@@ -1,0 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sabio.Models.Requests
+{
+    public class AdvertisementAddRequest
+    {
+        
+        [Required]
+        public int WorkShopId { get; set; }
+        [Required]
+        public string Title { get; set; }
+        [Required]
+        public string AdMainImage { get; set; }
+        [Required]
+        public string Details { get; set; }
+        [Required]
+        public DateTime DateStart { get; set; } // These values should be assigned
+        [Required]
+        public DateTime DateEnd { get; set; } // These values should be assigned
+
+
+    }
+}
