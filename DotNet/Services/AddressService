@@ -1,0 +1,57 @@
+using Sabio.Data.Providers;
+using Sabio.Models.Requests.Addresses;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sabio.Services
+{
+    public class AddressService : IAddressService
+    {
+        IDataProvider _data = null;
+
+        public AddressService(IDataProvider data)
+        {
+            _data = data;
+        }
+        public int Add(AddressAddRequest model)
+        {
+            int id = 0;
+
+            string procName = "[dbo].[Address_Insert]";
+            _data.ExecuteNonQuery(procName,
+                inputParamMapper: delegate (SqlParameterCollection col)
+                {
+
+                    AddCommonParams(model, col);
+
+                    SqlParameter idOut = new SqlParameter("@Id", SqlDbType.Int);
+                    idOut.Direction = ParameterDirection.Output;
+
+                    col.Add(idOut);
+                },
+                returnParameters: delegate (SqlParameterCollection col)
+                {
+                    object oId = col["@Id"].Value;
+                    int.TryParse(oId.ToString(), out id);
+
+                });
+
+            return id;
+        }
+
+        private static void AddCommonParams(AddressAddRequest model, SqlParameterCollection col)
+        {
+            col.AddWithValue("@AddressLine1", model.AddressLine1);
+            col.AddWithValue("@AddressLine2", model.AddressLine2 == null ? (object)DBNull.Value : model.AddressLine2);
+            col.AddWithValue("@City", model.City);
+            col.AddWithValue("@State", model.State);
+            col.AddWithValue("@Country", model.Country);
+            col.AddWithValue("@PostalCode", model.PostalCode);
+        }
+    }
+}
