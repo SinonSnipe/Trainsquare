@@ -1,0 +1,226 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Sabio.Models;
+using Sabio.Models.Domain;
+using Sabio.Models.Requests;
+using Sabio.Services;
+using Sabio.Web.Controllers;
+using Sabio.Web.Models.Responses;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+
+namespace Sabio.Web.Api.Controllers
+{
+    
+        [Route("api/advertisements")] 
+        [ApiController]
+       
+        public class AdvertisementsApiController : BaseApiController
+    {
+        private IAdvertisementServices _service = null;
+        private IAuthenticationService<int> _authService = null;
+
+        public AdvertisementsApiController(IAdvertisementServices service, ILogger<AdvertisementsApiController> logger,
+            IAuthenticationService<int> authService) : base(logger)
+
+        {
+            _service = service;
+            _authService = authService;
+
+        }
+
+        #region Advertisement_GetPaginated
+        [HttpGet("paginate")] 
+        public ActionResult<ItemResponse<Paged<Advertisements>>> Pagination(int pageIndex, int pageSize)
+        {
+            ActionResult result = null; 
+
+            try
+            {
+                Paged<Advertisements> paged = _service.Pagination(pageIndex, pageSize);
+
+                if (paged == null)
+                {
+                    result = NotFound404(new ErrorResponse("Records requested were not found."));
+                }
+                else
+                {
+                    ItemResponse<Paged<Advertisements>> response = new ItemResponse<Paged<Advertisements>>();
+                    response.Item = paged;
+                    result = Ok200(response);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                result = StatusCode(500, new ErrorResponse(ex.Message.ToString()));
+
+            }
+            return result;
+        }
+        #endregion
+
+        #region Advertisement_Insert
+        [HttpPost]
+        public ActionResult<ItemResponse<int>> Create(AdvertisementAddRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+
+                int currentUserId = _authService.GetCurrentUserId();
+
+                int id = _service.Add(model, currentUserId);
+
+                ItemResponse<int> response = new ItemResponse<int>() { Item = id };
+
+                result = Created201(response);
+            }
+            catch (Exception ex)
+            {
+
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse(ex.Message);
+
+                result = StatusCode(500, response);
+
+            }
+
+            return result;
+        }
+
+
+
+        #endregion
+
+        #region Advertisements_Update
+        [HttpPut("{id:int}")]
+        public ActionResult<SuccessResponse> Update(AdvertisementUpdateRequest model, int id)
+        {
+         
+            int code = 200;
+            BaseResponse response = null;
+            try
+            {
+                int userId = _authService.GetCurrentUserId();
+                _service.Update(model, userId, id);
+                response = new SuccessResponse();
+            }
+
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse(ex.Message);
+            }
+
+            return StatusCode(code, response);
+        }
+        #endregion
+
+        #region Advertisement_Delete
+        [HttpDelete("{id:int}")] 
+        public ActionResult<SuccessResponse> Delete(int id)
+        { 
+            int code = 200;
+            BaseResponse response = null; 
+
+            try
+            {
+                _service.Delete(id);
+
+                response = new SuccessResponse();
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse(ex.Message);
+
+            }
+
+            return StatusCode(code, response);
+
+        }
+        #endregion
+
+        #region Advertisement_SelectById
+        [HttpGet("{id:int}")]
+
+        public ActionResult<ItemResponse<Advertisements>> SelectById(int id)
+        {
+
+            int iCode = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                Advertisements Advertisement = _service.Get(id);
+
+              
+                if (Advertisement == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse($"The record of {id} was not found");
+                    return NotFound404(response);
+                }
+                else
+                {
+                    response = new ItemResponse<Advertisements> { Item = Advertisement };
+                }
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex.ToString());
+            }
+            return StatusCode(iCode, response);
+
+        }
+
+        #endregion
+
+        #region Advertisement_CreatedByPaginated
+        [HttpGet("current")] 
+                              
+        public ActionResult<ItemResponse<Paged<Advertisements>>> CreatedByPagination(int index, int pageSize)
+        {
+            ActionResult result = null;
+
+            try
+            {
+            int currentUserId = _authService.GetCurrentUserId();
+
+                Paged<Advertisements> paged = _service.CreatedByPagination(index, pageSize, currentUserId);
+
+                if (paged == null)
+                {
+                    result = NotFound404(new ErrorResponse("Records requested were not found."));
+                }
+                else
+                {
+                    ItemResponse<Paged<Advertisements>> response = new ItemResponse<Paged<Advertisements>>();
+                    response.Item = paged;
+                    result = Ok200(response);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                result = StatusCode(500, new ErrorResponse(ex.Message.ToString()));
+
+            }
+            return result;
+        }
+
+
+
+        #endregion
+
+      
+    }
+}
