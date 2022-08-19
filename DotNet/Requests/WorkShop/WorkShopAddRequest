@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sabio.Models.Requests.Workshop
+{
+	public class WorkShopAddRequest
+	{
+		[Required]
+		[StringLength(255, MinimumLength = 2)]
+		public string Name { get; set; }
+		[Required]
+		[StringLength(255, MinimumLength = 2)]
+		public string Summary { get; set; }
+		[Required, StringLength(4000, MinimumLength = 2)]
+		public string ShortDescription { get; set; }
+		[Required]
+		public int VenueId { get; set; }
+
+		[Required]
+		public int WorkShopTypeId { get; set; }
+		[Required]
+		public int WorkShopStatusId { get; set; }
+		public string ImageUrl { get; set; }
+		public string ExternalSiteUrl { get; set; }
+		[Required]
+		public int LanguageId { get; set; }
+		[Required]
+		public bool IsFree { get; set; }
+		public int NumberOfSessions { get; set; }
+		[Required]
+		public DateTime DateStart { get; set; }
+		[Required]
+		public DateTime DateEnd { get; set; }
+	}
+}
